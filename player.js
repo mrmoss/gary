@@ -122,7 +122,7 @@ function player_t(x,y)
 		if(simulation.keys_pressed[kb_up]&&!_this.jump&&!falling)
 		{
 			_this.jump=true;
-			_this.y_velocity=-8;
+			_this.y_velocity=-5;
 		}
 		if(_this.jump||falling)
 		{

@@ -10,7 +10,7 @@ function hover_t(x,y)
 	_this.spr=new sprite_t("hover.png",4);
 	_this.animation_speed=10;
 	_this.speed=20;
-	_this.direction=1;
+	_this.direction=-1;
 	_this.start_pos=x;
 	_this.max_dist=128;
 	_this.move_with=null;

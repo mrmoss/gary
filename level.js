@@ -14,7 +14,7 @@ function level_t(pos)
 	}
 
 	_this.hovers.push(new hover_t(120,120));
-	_this.hovers.push(new hover_t(260,190));
+	_this.hovers.push(new hover_t(370,190));
 
 	_this.loop=function(simulation,dt,level)
 	{
