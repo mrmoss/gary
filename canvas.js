@@ -3,6 +3,45 @@ var kb_up=38;
 var kb_right=39;
 var kb_down=40;
 
+function get_left(obj)
+{
+	return -obj.width/2.0;
+}
+
+function get_right(obj)
+{
+	return obj.width/2.0;
+}
+
+function get_bottom(obj)
+{
+	return obj.height/2.0-obj.height_offset;
+}
+
+function get_top(obj)
+{
+	return -obj.height/2.0-obj.height_offset;
+}
+
+function check_collision_pos(obj1,x,y,obj2)
+{
+	return (x+get_right(obj1)>=obj2.x+get_left(obj2)&&
+		x+get_left(obj1)<=obj2.x+get_right(obj2)&&
+		y+get_bottom(obj1)>=obj2.y+get_top(obj2)&&
+		y+get_top(obj1)<=obj2.y+get_bottom(obj2));
+}
+
+function check_collision_beneath_pos(obj1,x,y,obj2)
+{
+	var obj1_bottom=y+get_bottom(obj1);
+	var obj2_top=obj2.y+get_top(obj2);
+
+	return (x+get_right(obj1)>=obj2.x+get_left(obj2)&&
+		x+get_left(obj1)<=obj2.x+get_right(obj2)&&
+		obj1_bottom>=obj2_top&&obj1_bottom-obj2_top<1&&
+		obj2_top<=obj1_bottom);
+}
+
 function canvas_t(canvas_obj,setup_func,loop_func,draw_func)
 {
 	var _this=this;

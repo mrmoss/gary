@@ -4,6 +4,9 @@ function crate_t(x,y)
 
 	_this.x=x;
 	_this.y=y;
+	_this.width=0;
+	_this.height=0;
+	_this.height_offset=0;
 	_this.spr=new sprite_t("crate.png",1);
 
 	_this.loop=function(simulation,dt,level)
@@ -11,6 +14,7 @@ function crate_t(x,y)
 		if(!simulation)
 			return;
 
+		_this.width=_this.spr.width;
 		_this.height=_this.spr.height;
 		_this.height_offset=0;
 	}

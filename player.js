@@ -4,48 +4,78 @@ function player_t(x,y)
 
 	_this.x=x;
 	_this.y=y;
+	_this.width=0;
+	_this.height=0;
+	_this.height_offset=0;
 	_this.spr_idle=new sprite_t("player_idle.png",1);
 	_this.spr_move=new sprite_t("player_move.png",4);
 	_this.spr_jump=new sprite_t("player_jump.png",1);
 	_this.spr=_this.spr_idle;
 	_this.speed=100;
-	_this.animation_speed=10;
+	_this.animation_speed=8;
 	_this.jump=false;
 	_this.direction=1;
-	_this.bb={width:0,height:0};
 	_this.v_speed=0;
 	_this.y_velocity=0;
 	_this.move_with=null;
+
+
 
 	_this.loop=function(simulation,dt,level)
 	{
 		if(!simulation)
 			return;
 
+		_this.width=22;
+		_this.height=Math.max(_this.spr_idle.height,_this.spr_move.height,_this.spr_jump.height);
+		_this.height_offset=0;
+
 		//Check for Under Collision
 		var collision=false;
+		var check_sensitivity=1;
 		var new_y=_this.y+_this.y_velocity;
+		if(Math.abs(_this.y_velocity)<1)
+			new_y=_this.y;
+		var y_velocity_multiplier=1;
+		if(_this.y_velocity<0)
+			y_velocity_multiplier=-1;
 
-		var check_under_collision=function(objects,move_with)
-		{
-			for(var ii=0;ii<objects.length;++ii)
+		//Falling Collisions with Crates
+		if(_this.y_velocity!=0)
+			for(var ii=0;ii<level.crates.length;++ii)
 			{
-				if(_this.x+_this.bb.width/2.0>=objects[ii].x-objects[ii].spr.width/2.0&&
-					_this.x-_this.bb.width/2.0<=objects[ii].x+objects[ii].spr.width/2.0&&
-					new_y+_this.bb.height/2.0>=objects[ii].y-objects[ii].height/2.0-objects[ii].height_offset&&
-					new_y-_this.bb.height/2.0<=objects[ii].y+objects[ii].height/2.0-objects[ii].height_offset)
-				{
-					collision=true;
-					_this.y_velocity=0;
-					_this.jump=false;
-
-					if(move_with)
-						_this.set_move_with(objects[ii]);
-				}
+				if(collision)
+					break;
+				for(var dist=0;dist<Math.abs(_this.y_velocity);dist+=check_sensitivity)
+					if(check_collision_pos(_this,_this.x,_this.y+dist*y_velocity_multiplier,level.crates[ii]))
+					{
+						_this.y=Math.round(level.crates[ii].y+get_top(level.crates[ii])-_this.height/2.0)-y_velocity_multiplier;
+						collision=true;
+						_this.y_velocity=0;
+						y_velocity_multiplier=0;
+						_this.jump=false;
+						break;
+					}
 			}
-		}
-		check_under_collision(level.crates,false);
-		check_under_collision(level.hovers,true);
+
+		//Falling Collisions with Hovers (Under player only)
+		if(_this.y_velocity>0)
+			for(var ii=0;ii<level.hovers.length;++ii)
+			{
+				if(collision)
+					break;
+				for(var dist=0;dist<_this.y_velocity;dist+=check_sensitivity)
+					if(check_collision_beneath_pos(_this,_this.x,_this.y+dist,level.hovers[ii]))
+					{
+						_this.y=Math.round(level.hovers[ii].y+get_top(level.hovers[ii])-_this.height/2.0)-y_velocity_multiplier;
+						collision=true;
+						_this.y_velocity=0;
+						_this.jump=false;
+						_this.set_move_with(level.hovers[ii]);
+						break;
+					}
+				}
+
 		if(!collision)
 		{
 			_this.y=new_y;
@@ -75,37 +105,24 @@ function player_t(x,y)
 		{
 			var collision=false;
 
-			var check_move_collisions=function(objects,move_with)
-			{
-				for(var ii=0;ii<objects.length;++ii)
+			//We Move Based Collisions with Crates
+			for(var ii=0;ii<level.crates.length;++ii)
+				if(check_collision_pos(_this,new_x,_this.y,level.crates[ii]))
 				{
-					if(new_x+_this.bb.width/2.0>=objects[ii].x-objects[ii].spr.width/2.0&&
-						new_x-_this.bb.width/2.0<=objects[ii].x+objects[ii].spr.width/2.0&&
-						_this.y+_this.bb.height/2.0>=objects[ii].y-objects[ii].height/2.0-objects[ii].height_offset&&
-						_this.y-_this.bb.height/2.0<=objects[ii].y+objects[ii].height/2.0-objects[ii].height_offset)
-					{
-						collision=true;
-
-						if(move_with)
-							_this.set_move_with(objects[ii]);
-
-						break;
-					}
+					collision=true;
+					break;
 				}
-			}
-			check_move_collisions(level.crates,false);
-			check_move_collisions(level.hovers,true);
 
 			if(!collision)
 				_this.x=new_x;
 		}
 
 		//Jump
-		var falling=Math.abs(_this.y_velocity>1);
+		var falling=Math.abs(_this.y_velocity>2);
 		if(simulation.keys_pressed[kb_up]&&!_this.jump&&!falling)
 		{
 			_this.jump=true;
-			_this.y_velocity=-5;
+			_this.y_velocity=-8;
 		}
 		if(_this.jump||falling)
 		{
@@ -134,9 +151,6 @@ function player_t(x,y)
 		if(!simulation)
 			return;
 
-		_this.bb.width=22;
-		_this.bb.height=Math.max(_this.spr_idle.height,_this.spr_move.height,_this.spr_jump.height);
-
 		simulation.ctx.save();
 		simulation.ctx.translate(_this.x,_this.y);
 		_this.spr.draw(simulation);
@@ -147,9 +161,6 @@ function player_t(x,y)
 	{
 		if(_this.move_with===object)
 			return;
-
-		if(!_this.move_with&&object)
-			_this.x+=object.direction*5;
 
 		if(_this.move_with)
 		{

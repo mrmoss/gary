@@ -7,9 +7,14 @@ function level_t(pos)
 
 
 	for(var ii=0;ii<13;++ii)
+	{
 		_this.crates.push(new crate_t(pos.x+16*ii,pos.y+64));
+		if(ii==0||ii==12)
+			_this.crates.push(new crate_t(pos.x+16*ii,pos.y+64-16));
+	}
 
 	_this.hovers.push(new hover_t(120,120));
+	_this.hovers.push(new hover_t(260,190));
 
 	_this.loop=function(simulation,dt,level)
 	{

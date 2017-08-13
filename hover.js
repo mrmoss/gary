@@ -4,6 +4,9 @@ function hover_t(x,y)
 
 	_this.x=x;
 	_this.y=y;
+	_this.width=0;
+	_this.height=0;
+	_this.height_offset=0;
 	_this.spr=new sprite_t("hover.png",4);
 	_this.animation_speed=10;
 	_this.speed=20;
@@ -17,6 +20,8 @@ function hover_t(x,y)
 		if(!simulation)
 			return;
 
+
+		_this.width=_this.spr.width;
 		_this.height=8;
 		_this.height_offset=(_this.spr.height-_this.height)/2;
 		_this.spr.frame+=_this.animation_speed*dt;
