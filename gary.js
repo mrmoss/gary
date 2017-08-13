@@ -1,22 +1,23 @@
-function crate_t(x,y)
+function gary_t(x,y)
 {
 	this.x=x;
 	this.y=y;
 	this.width=0;
 	this.height=0;
-	this.spr=new sprite_t("crate.png",1);
-}
+	this.spr=new sprite_t("gary.png",2);
+	this.direction=1;
+};
 
-crate_t.prototype.loop=function(simulation,dt,level)
+gary_t.prototype.loop=function(simulation,dt,level)
 {
 	if(!simulation)
 		return;
 
-	this.width=this.spr.width;
+	this.width=22;
 	this.height=this.spr.height;
-}
+};
 
-crate_t.prototype.draw=function(simulation)
+gary_t.prototype.draw=function(simulation)
 {
 	if(!simulation)
 		return;
@@ -25,4 +26,4 @@ crate_t.prototype.draw=function(simulation)
 	simulation.ctx.translate(this.x,this.y);
 	this.spr.draw(simulation);
 	simulation.ctx.restore();
-}
+};

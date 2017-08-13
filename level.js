@@ -1,34 +1,46 @@
-function level_t(pos)
+function level_t(simulation)
 {
-	var _this=this;
+	var canvas_width=simulation.canvas.width;
+	var canvas_height=simulation.canvas.height;
 
-	_this.crates=[];
-	_this.hovers=[];
+	this.player=new player_t(canvas_width/2,0);
+	this.crates=[];
+	this.hovers=[];
+	this.garys=[];
 
-
-	for(var ii=0;ii<13;++ii)
+	var crate_size=16;
+	var crate_start_x=0;
+	var crate_start_y=canvas_height;
+	for(var ii=0;ii<320/crate_size;++ii)
 	{
-		_this.crates.push(new crate_t(pos.x+16*ii,pos.y+64));
-		if(ii==0||ii==12)
-			_this.crates.push(new crate_t(pos.x+16*ii,pos.y+64-16));
+		this.crates.push(new crate_t(crate_start_x+crate_size*ii,crate_start_y));
+		if(ii==0||ii+1>=320/crate_size)
+			this.crates.push(new crate_t(crate_start_x+crate_size*ii,crate_start_y-crate_size));
 	}
 
-	_this.hovers.push(new hover_t(120,120));
-	_this.hovers.push(new hover_t(370,190));
+	this.hovers.push(new hover_t(320/2,200));
 
-	_this.loop=function(simulation,dt,level)
-	{
-		for(var ii=0;ii<_this.crates.length;++ii)
-			_this.crates[ii].loop(simulation,dt,level);
-		for(var ii=0;ii<_this.hovers.length;++ii)
-			_this.hovers[ii].loop(simulation,dt,level);
-	}
+	this.garys.push(new gary_t(0,10));
+}
 
-	_this.draw=function(simulation)
-	{
-		for(var ii=0;ii<_this.crates.length;++ii)
-			_this.crates[ii].draw(simulation);
-		for(var ii=0;ii<_this.hovers.length;++ii)
-			_this.hovers[ii].draw(simulation);
-	};
-};
+level_t.prototype.loop=function(simulation,dt)
+{
+	for(var ii=0;ii<this.crates.length;++ii)
+		this.crates[ii].loop(simulation,dt,this);
+	for(var ii=0;ii<this.hovers.length;++ii)
+		this.hovers[ii].loop(simulation,dt,this);
+	for(var ii=0;ii<this.garys.length;++ii)
+		this.garys[ii].loop(simulation,dt,this);
+	this.player.loop(simulation,dt,this);
+}
+
+level_t.prototype.draw=function(simulation)
+{
+	for(var ii=0;ii<this.crates.length;++ii)
+		this.crates[ii].draw(simulation);
+	for(var ii=0;ii<this.hovers.length;++ii)
+		this.hovers[ii].draw(simulation);
+	for(var ii=0;ii<this.garys.length;++ii)
+		this.garys[ii].draw(simulation);
+	this.player.draw(simulation);
+}

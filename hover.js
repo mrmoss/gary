@@ -1,46 +1,41 @@
 function hover_t(x,y)
 {
-	var _this=this;
+	this.x=x;
+	this.y=y;
+	this.width=0;
+	this.height=0;
+	this.spr=new sprite_t("hover.png",4);
+	this.animation_speed=10;
+	this.speed=20;
+	this.direction=-1;
+	this.start_pos=x;
+	this.max_dist=128;
+	this.move_with=null;
+}
 
-	_this.x=x;
-	_this.y=y;
-	_this.width=0;
-	_this.height=0;
-	_this.height_offset=0;
-	_this.spr=new sprite_t("hover.png",4);
-	_this.animation_speed=10;
-	_this.speed=20;
-	_this.direction=-1;
-	_this.start_pos=x;
-	_this.max_dist=128;
-	_this.move_with=null;
+hover_t.prototype.loop=function(simulation,dt,level)
+{
+	if(!simulation)
+		return;
 
-	_this.loop=function(simulation,dt,level)
-	{
-		if(!simulation)
-			return;
+	this.width=this.spr.width;
+	this.height=this.spr.height;
+	this.spr.frame+=this.animation_speed*dt;
 
+	this.x+=this.speed*this.direction*dt;
+	if(this.move_with)
+		this.move_with.x+=this.speed*this.direction*dt;
 
-		_this.width=_this.spr.width;
-		_this.height=8;
-		_this.height_offset=(_this.spr.height-_this.height)/2;
-		_this.spr.frame+=_this.animation_speed*dt;
+	if(this.x>this.start_pos+this.max_dist/2)
+		this.direction=-1;
+	if(this.x<this.start_pos-this.max_dist/2)
+		this.direction=1;
+}
 
-		_this.x+=_this.speed*_this.direction*dt;
-		if(_this.move_with)
-			_this.move_with.x+=_this.speed*_this.direction*dt;
-
-		if(_this.x>_this.start_pos+_this.max_dist/2)
-			_this.direction=-1;
-		if(_this.x<_this.start_pos-_this.max_dist/2)
-			_this.direction=1;
-	}
-
-	_this.draw=function(simulation)
-	{
-		simulation.ctx.save();
-		simulation.ctx.translate(_this.x,_this.y);
-		_this.spr.draw(simulation);
-		simulation.ctx.restore();
-	};
-};
+hover_t.prototype.draw=function(simulation)
+{
+	simulation.ctx.save();
+	simulation.ctx.translate(this.x,this.y);
+	this.spr.draw(simulation);
+	simulation.ctx.restore();
+}

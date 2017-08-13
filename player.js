@@ -1,176 +1,172 @@
 function player_t(x,y)
 {
-	var _this=this;
+	this.x=x;
+	this.y=y;
+	this.width=0;
+	this.height=0;
+	this.spr_idle=new sprite_t("player_idle.png",1);
+	this.spr_move=new sprite_t("player_move.png",4);
+	this.spr_jump=new sprite_t("player_jump.png",1);
+	this.spr=this.spr_idle;
+	this.speed=100;
+	this.animation_speed=8;
+	this.jump=false;
+	this.direction=1;
+	this.v_speed=0;
+	this.y_velocity=0;
+	this.move_with=null;
+};
 
-	_this.x=x;
-	_this.y=y;
-	_this.width=0;
-	_this.height=0;
-	_this.height_offset=0;
-	_this.spr_idle=new sprite_t("player_idle.png",1);
-	_this.spr_move=new sprite_t("player_move.png",4);
-	_this.spr_jump=new sprite_t("player_jump.png",1);
-	_this.spr=_this.spr_idle;
-	_this.speed=100;
-	_this.animation_speed=8;
-	_this.jump=false;
-	_this.direction=1;
-	_this.v_speed=0;
-	_this.y_velocity=0;
-	_this.move_with=null;
+player_t.prototype.loop=function(simulation,dt,level)
+{
+	if(!simulation)
+		return;
 
+	this.width=22;
+	this.height=Math.max(this.spr_idle.height,this.spr_move.height,this.spr_jump.height);
 
+	//Check for Under Collision
+	var collision=false;
+	var check_sensitivity=1;
+	var new_y=this.y;
+	if(Math.abs(this.y_velocity)>1)
+		new_y=this.y+this.y_velocity
+	var y_velocity_multiplier=1;
+	if(this.y_velocity<0)
+		y_velocity_multiplier=-1;
 
-	_this.loop=function(simulation,dt,level)
-	{
-		if(!simulation)
-			return;
-
-		_this.width=22;
-		_this.height=Math.max(_this.spr_idle.height,_this.spr_move.height,_this.spr_jump.height);
-		_this.height_offset=0;
-
-		//Check for Under Collision
-		var collision=false;
-		var check_sensitivity=1;
-		var new_y=_this.y+_this.y_velocity;
-		if(Math.abs(_this.y_velocity)<1)
-			new_y=_this.y;
-		var y_velocity_multiplier=1;
-		if(_this.y_velocity<0)
-			y_velocity_multiplier=-1;
-
-		//Falling Collisions with Crates
-		if(_this.y_velocity!=0)
-			for(var ii=0;ii<level.crates.length;++ii)
-			{
-				if(collision)
+	//Falling Collisions with Crates
+	if(this.y_velocity!=0)
+		for(var ii=0;ii<level.crates.length;++ii)
+		{
+			if(collision)
+				break;
+			for(var dist=0;dist<Math.abs(this.y_velocity);dist+=check_sensitivity)
+				if(check_collision_pos(this,this.x,this.y+dist*y_velocity_multiplier,level.crates[ii]))
+				{
+					this.y=level.crates[ii].y-level.crates[ii].height;
+					collision=true;
+					this.y_velocity=0;
+					y_velocity_multiplier=0;
+					this.jump=false;
 					break;
-				for(var dist=0;dist<Math.abs(_this.y_velocity);dist+=check_sensitivity)
-					if(check_collision_pos(_this,_this.x,_this.y+dist*y_velocity_multiplier,level.crates[ii]))
-					{
-						_this.y=Math.round(level.crates[ii].y+get_top(level.crates[ii])-_this.height/2.0)-y_velocity_multiplier;
-						collision=true;
-						_this.y_velocity=0;
-						y_velocity_multiplier=0;
-						_this.jump=false;
-						break;
-					}
+				}
+		}
+
+	//Falling Collisions with Hovers (Under player only)
+	if(this.y_velocity>0)
+		for(var ii=0;ii<level.hovers.length;++ii)
+		{
+			if(collision)
+				break;
+			for(var dist=0;dist<this.y_velocity;dist+=check_sensitivity)
+				if(check_collision_beneath_pos(this,this.x,this.y+dist*y_velocity_multiplier,level.hovers[ii]))
+				{
+					this.y=level.hovers[ii].y-level.hovers[ii].height;
+					collision=true;
+					this.y_velocity=0;
+					y_velocity_multiplier=0;
+					this.jump=false;
+					this.set_move_with(level.hovers[ii]);
+					break;
+				}
 			}
 
-		//Falling Collisions with Hovers (Under player only)
-		if(_this.y_velocity>0)
-			for(var ii=0;ii<level.hovers.length;++ii)
+	if(!collision)
+	{
+		this.y=new_y;
+		this.y_velocity+=9.8*dt;
+	}
+	if(this.y_velocity>100)
+		this.y_velocity=100;
+	if(this.y_velocity<-100)
+		this.y_velocity=-100;
+
+	//Move Left/Right
+	var moved=false;
+	var new_x=this.x;
+	if(simulation.keys_down[kb_right]&&!simulation.keys_down[kb_left])
+	{
+		moved=true;
+		this.direction=1;
+		new_x=this.x+this.speed*dt*this.direction;
+	}
+	if(!simulation.keys_down[kb_right]&&simulation.keys_down[kb_left])
+	{
+		moved=true;
+		this.direction=-1;
+		new_x=this.x+this.speed*dt*this.direction;
+	}
+	if(moved)
+	{
+		var collision=false;
+
+		//We Move Based Collisions with Crates
+		for(var ii=0;ii<level.crates.length;++ii)
+			if(check_collision_pos(this,new_x,this.y,level.crates[ii]))
 			{
-				if(collision)
-					break;
-				for(var dist=0;dist<_this.y_velocity;dist+=check_sensitivity)
-					if(check_collision_beneath_pos(_this,_this.x,_this.y+dist,level.hovers[ii]))
-					{
-						_this.y=Math.round(level.hovers[ii].y+get_top(level.hovers[ii])-_this.height/2.0)-y_velocity_multiplier;
-						collision=true;
-						_this.y_velocity=0;
-						_this.jump=false;
-						_this.set_move_with(level.hovers[ii]);
-						break;
-					}
-				}
+				collision=true;
+				break;
+			}
 
 		if(!collision)
-		{
-			_this.y=new_y;
-			_this.y_velocity+=9.8*dt;
-		}
-		if(_this.y_velocity>100)
-			_this.y_velocity=100;
-		if(_this.y_velocity<-100)
-			_this.y_velocity=-100;
+			this.x=new_x;
+	}
 
-		//Move Left/Right
-		var moved=false;
-		var new_x=x;
-		if(simulation.keys_down[kb_right]&&!simulation.keys_down[kb_left])
-		{
-			moved=true;
-			_this.direction=1;
-			new_x=_this.x+_this.speed*dt*_this.direction;
-		}
-		if(!simulation.keys_down[kb_right]&&simulation.keys_down[kb_left])
-		{
-			moved=true;
-			_this.direction=-1;
-			new_x=_this.x+_this.speed*dt*_this.direction;
-		}
+	//Jump
+	var falling=Math.abs(this.y_velocity>2);
+	if(simulation.keys_pressed[kb_up]&&!this.jump&&!falling)
+	{
+		this.jump=true;
+		this.y_velocity=-5;
+	}
+	if(this.jump||falling)
+	{
+		this.spr=this.spr_jump;
+		this.spr.x_scale=this.direction;
+		this.set_move_with(null);
+	}
+	else
+	{
 		if(moved)
 		{
-			var collision=false;
-
-			//We Move Based Collisions with Crates
-			for(var ii=0;ii<level.crates.length;++ii)
-				if(check_collision_pos(_this,new_x,_this.y,level.crates[ii]))
-				{
-					collision=true;
-					break;
-				}
-
-			if(!collision)
-				_this.x=new_x;
-		}
-
-		//Jump
-		var falling=Math.abs(_this.y_velocity>2);
-		if(simulation.keys_pressed[kb_up]&&!_this.jump&&!falling)
-		{
-			_this.jump=true;
-			_this.y_velocity=-5;
-		}
-		if(_this.jump||falling)
-		{
-			_this.spr=_this.spr_jump;
-			_this.spr.x_scale=_this.direction;
-			_this.set_move_with(null);
+			this.spr=this.spr_move;
+			this.spr.frame+=this.animation_speed*dt;
 		}
 		else
 		{
-			if(moved)
-			{
-				_this.spr=_this.spr_move;
-				_this.spr.frame+=_this.animation_speed*dt;
-			}
-			else
-			{
-				_this.spr=_this.spr_idle;
-			}
-
-			_this.spr.x_scale=_this.direction;
-		}
-	};
-
-	_this.draw=function(simulation)
-	{
-		if(!simulation)
-			return;
-
-		simulation.ctx.save();
-		simulation.ctx.translate(_this.x,_this.y);
-		_this.spr.draw(simulation);
-		simulation.ctx.restore();
-	};
-
-	_this.set_move_with=function(object)
-	{
-		if(_this.move_with===object)
-			return;
-
-		if(_this.move_with)
-		{
-			_this.move_with.move_with=null;
-			_this.move_with=null;
+			this.spr=this.spr_idle;
 		}
 
-		_this.move_with=object;
-
-		if(object)
-			object.move_with=_this;
+		this.spr.x_scale=this.direction;
 	}
 };
+
+player_t.prototype.draw=function(simulation)
+{
+	if(!simulation)
+		return;
+
+	simulation.ctx.save();
+	simulation.ctx.translate(this.x,this.y);
+	this.spr.center_x=true;
+	this.spr.draw(simulation);
+	simulation.ctx.restore();
+};
+
+player_t.prototype.set_move_with=function(object)
+{
+	if(this.move_with===object)
+		return;
+
+	if(this.move_with)
+	{
+		this.move_with.move_with=null;
+		this.move_with=null;
+	}
+
+	this.move_with=object;
+
+	if(object)
+		object.move_with=this;
+}
