@@ -3,6 +3,8 @@ function level_t(simulation)
 	var canvas_width=simulation.canvas.width;
 	var canvas_height=simulation.canvas.height;
 
+	simulation.clear_color='#5e5e5e';
+
 	this.player=new player_t(canvas_width/2,0);
 	this.crates=[];
 	this.hovers=[];
@@ -18,9 +20,9 @@ function level_t(simulation)
 			this.crates.push(new crate_t(crate_start_x+crate_size*ii,crate_start_y-crate_size));
 	}
 
-	this.hovers.push(new hover_t(320/2,200));
+	this.hovers.push(new hover_t(canvas_width/2,crate_start_y-crate_size*2));
 
-	this.garys.push(new gary_t(0,10));
+	this.garys.push(new gary_t(canvas_width/2,crate_start_y-crate_size));
 }
 
 level_t.prototype.loop=function(simulation,dt)
@@ -36,11 +38,11 @@ level_t.prototype.loop=function(simulation,dt)
 
 level_t.prototype.draw=function(simulation)
 {
+	for(var ii=0;ii<this.garys.length;++ii)
+		this.garys[ii].draw(simulation);
+	this.player.draw(simulation);
 	for(var ii=0;ii<this.crates.length;++ii)
 		this.crates[ii].draw(simulation);
 	for(var ii=0;ii<this.hovers.length;++ii)
 		this.hovers[ii].draw(simulation);
-	for(var ii=0;ii<this.garys.length;++ii)
-		this.garys[ii].draw(simulation);
-	this.player.draw(simulation);
 }

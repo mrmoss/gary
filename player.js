@@ -4,9 +4,9 @@ function player_t(x,y)
 	this.y=y;
 	this.width=0;
 	this.height=0;
-	this.spr_idle=new sprite_t("player_idle.png",1);
-	this.spr_move=new sprite_t("player_move.png",4);
-	this.spr_jump=new sprite_t("player_jump.png",1);
+	this.spr_idle=new sprite_t('player_idle.png',1);
+	this.spr_move=new sprite_t('player_move.png',4);
+	this.spr_jump=new sprite_t('player_jump.png',1);
 	this.spr=this.spr_idle;
 	this.speed=100;
 	this.animation_speed=8;
@@ -22,7 +22,7 @@ player_t.prototype.loop=function(simulation,dt,level)
 	if(!simulation)
 		return;
 
-	this.width=22;
+	this.width=20;
 	this.height=Math.max(this.spr_idle.height,this.spr_move.height,this.spr_jump.height);
 
 	//Check for Under Collision
@@ -42,7 +42,7 @@ player_t.prototype.loop=function(simulation,dt,level)
 			if(collision)
 				break;
 			for(var dist=0;dist<Math.abs(this.y_velocity);dist+=check_sensitivity)
-				if(check_collision_pos(this,this.x,this.y+dist*y_velocity_multiplier,level.crates[ii]))
+				if(check_collision_pos(this,this.x-this.width/2,this.y+dist*y_velocity_multiplier,level.crates[ii]))
 				{
 					this.y=level.crates[ii].y-level.crates[ii].height;
 					collision=true;
@@ -60,7 +60,7 @@ player_t.prototype.loop=function(simulation,dt,level)
 			if(collision)
 				break;
 			for(var dist=0;dist<this.y_velocity;dist+=check_sensitivity)
-				if(check_collision_beneath_pos(this,this.x,this.y+dist*y_velocity_multiplier,level.hovers[ii]))
+				if(check_collision_beneath_pos(this,this.x-this.width/2,this.y+dist*y_velocity_multiplier,level.hovers[ii]))
 				{
 					this.y=level.hovers[ii].y-level.hovers[ii].height;
 					collision=true;
@@ -103,7 +103,7 @@ player_t.prototype.loop=function(simulation,dt,level)
 
 		//We Move Based Collisions with Crates
 		for(var ii=0;ii<level.crates.length;++ii)
-			if(check_collision_pos(this,new_x,this.y,level.crates[ii]))
+			if(check_collision_pos(this,new_x-this.width/2,this.y,level.crates[ii]))
 			{
 				collision=true;
 				break;
@@ -148,8 +148,7 @@ player_t.prototype.draw=function(simulation)
 		return;
 
 	simulation.ctx.save();
-	simulation.ctx.translate(this.x,this.y);
-	this.spr.center_x=true;
+	simulation.ctx.translate(this.x-this.spr.width/2.0*this.spr.x_scale,this.y);
 	this.spr.draw(simulation);
 	simulation.ctx.restore();
 };

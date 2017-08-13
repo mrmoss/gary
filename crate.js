@@ -4,7 +4,7 @@ function crate_t(x,y)
 	this.y=y;
 	this.width=0;
 	this.height=0;
-	this.spr=new sprite_t("crate.png",1);
+	this.spr=new sprite_t('crate.png',1);
 }
 
 crate_t.prototype.loop=function(simulation,dt,level)

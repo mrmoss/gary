@@ -23,6 +23,7 @@ function check_collision_beneath_pos(obj1,x,y,obj2)
 function canvas_t(canvas_obj,setup_func,loop_func,draw_func)
 {
 	this.canvas=canvas_obj;
+	this.clear_color='#ffffff';
 	this.old_time=new Date();
 	this.user_setup=setup_func;
 	this.user_loop=loop_func;
@@ -38,7 +39,7 @@ canvas_t.prototype.setup=function()
 	if(!this.canvas)
 		return false;
 
-	this.ctx=this.canvas.getContext("2d");
+	this.ctx=this.canvas.getContext('2d');
 
 	if(!this.ctx)
 		return false;
@@ -54,8 +55,8 @@ canvas_t.prototype.setup=function()
 	this.loop();
 
 	var _this=this;
-	window.addEventListener("keydown",function(evt){_this.keydown(evt);},true);
-	window.addEventListener("keyup",function(evt){_this.keyup(evt);},true);
+	window.addEventListener('keydown',function(evt){_this.keydown(evt);},true);
+	window.addEventListener('keyup',function(evt){_this.keyup(evt);},true);
 
 	return true;
 };
@@ -72,17 +73,6 @@ canvas_t.prototype.keyup=function(evt)
 {
 	this.keys_released[evt.keyCode]=true;
 	this.keys_down[evt.keyCode]=false;
-};
-
-canvas_t.prototype.draw=function()
-{
-	if(this.canvas&&this.ctx&&this.user_draw)
-	{
-		this.ctx.globalCompositeOperation="destination-over";
-		this.ctx.clearRect(0,0,this.canvas.width,this.canvas.height);
-		this.user_draw();
-		this.ctx.restore();
-	}
 };
 
 canvas_t.prototype.loop=function()
@@ -103,4 +93,15 @@ canvas_t.prototype.loop=function()
 
 	var _this=this;
 	window.requestAnimationFrame(function(){_this.loop();});
-};
+}
+
+canvas_t.prototype.draw=function()
+{
+	if(this.canvas&&this.ctx&&this.user_draw)
+	{
+		this.ctx.fillStyle=this.clear_color;
+		this.ctx.fillRect(0,0,this.canvas.width,this.canvas.height);
+		this.user_draw();
+		this.ctx.restore();
+	}
+}
