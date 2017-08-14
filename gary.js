@@ -99,15 +99,19 @@ function gary_tenticle_t(gary,xoff,yoff,dir,dir_multiplier)
 
 	for(var ii=0;ii<num_segments;++ii)
 	{
-		var length=8-ii/2.0;
-		parent=new gary_segment_t(this,parent,ii);
+		parent=new gary_segment_t(this,parent);
 
-		parent.dir=dir;
 		parent.thickness=thickness;
+		parent.dir=dir;
+		parent.target_dir=Math.PI/2.0/num_segments*ii*dir_multiplier;
+
+		var length=8-ii/2.0;
 		parent.left_muscle=new gary_muscle_t(length/2.0,length);
 		parent.right_muscle=new gary_muscle_t(length/2.0,length);
+
 		parent.xoff=total_length;
-		parent.target_dir=Math.PI/2.0/num_segments*ii*dir_multiplier;
+		parent.yoff=0;
+
 		this.segments.push(parent);
 
 		thickness=thickness*0.92;
@@ -141,7 +145,7 @@ gary_tenticle_t.prototype.loop=function(simulation,dt,level)
 		this.segments[ii].right_muscle.relax();
 		if(this.target_x!=null&&this.target_y!=null)
 			this.segments[ii].target(this.target_x-this.x,this.target_y-this.y);
-		this.segments[ii].loop(dt);
+		this.segments[ii].loop(simulation,dt,level);
 	}
 }
 
@@ -151,20 +155,25 @@ gary_tenticle_t.prototype.draw=function(simulation)
 		this.segments[ii].draw(simulation);
 }
 
-function gary_segment_t(tenticle,parent,num)
+function gary_segment_t(tenticle,parent)
 {
 	this.tenticle=tenticle;
 	this.parent=parent;
-	this.num=num;
-	this.dir=0;
+
 	this.thickness=0;
+	this.dir=0;
+	this.target_dir=0;
+
 	this.left_muscle=null;
 	this.right_muscle=null;
-	this.xoff=0;
-	this.yoff=0;
-	this.target_dir=0;
+
 	this.x=0;
 	this.y=0;
+	this.xoff=0;
+	this.yoff=0;
+
+	this.orig_color='#667331';
+	this.color=this.orig_color;
 }
 
 gary_segment_t.prototype.muscle_dir=function()
@@ -172,7 +181,7 @@ gary_segment_t.prototype.muscle_dir=function()
 	return (this.left_muscle.length+this.right_muscle.length)/4.0;
 };
 
-gary_segment_t.prototype.loop=function(dt)
+gary_segment_t.prototype.loop=function(simulation,dt,level)
 {
 	if(this.parent)
 	{
@@ -189,6 +198,11 @@ gary_segment_t.prototype.loop=function(dt)
 
 	this.x=this.tenticle.x+this.xoff;
 	this.y=this.tenticle.y+this.yoff;
+
+	if(check_collision_pos({width:this.thickness,height:this.thickness},this.x+level.player.width/2.0,this.y,level.player))
+		this.color='red';
+	else
+		this.color=this.orig_color;
 };
 
 gary_segment_t.prototype.draw=function(simulation)
@@ -201,7 +215,7 @@ gary_segment_t.prototype.draw=function(simulation)
 	simulation.ctx.arc(0,0,this.thickness/2,0,2*Math.PI,false);
 	simulation.ctx.fill();
 
-	simulation.ctx.fillStyle="#667331";
+	simulation.ctx.fillStyle=this.color;
 	simulation.ctx.beginPath();
 	simulation.ctx.arc(0,0,(this.thickness-1)/2,0,2*Math.PI,false);
 	simulation.ctx.fill();
