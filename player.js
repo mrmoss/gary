@@ -11,7 +11,7 @@ function player_t(x,y)
 	this.speed=100;
 	this.animation_speed=8;
 	this.jump=false;
-	this.direction=1;
+	this.dir=1;
 	this.v_speed=0;
 	this.y_velocity=0;
 	this.move_with=null;
@@ -88,14 +88,14 @@ player_t.prototype.loop=function(simulation,dt,level)
 	if(simulation.keys_down[kb_right]&&!simulation.keys_down[kb_left])
 	{
 		moved=true;
-		this.direction=1;
-		new_x=this.x+this.speed*dt*this.direction;
+		this.dir=1;
+		new_x=this.x+this.speed*dt*this.dir;
 	}
 	if(!simulation.keys_down[kb_right]&&simulation.keys_down[kb_left])
 	{
 		moved=true;
-		this.direction=-1;
-		new_x=this.x+this.speed*dt*this.direction;
+		this.dir=-1;
+		new_x=this.x+this.speed*dt*this.dir;
 	}
 	if(moved)
 	{
@@ -123,7 +123,7 @@ player_t.prototype.loop=function(simulation,dt,level)
 	if(this.jump||falling)
 	{
 		this.spr=this.spr_jump;
-		this.spr.x_scale=this.direction;
+		this.spr.x_scale=this.dir;
 		this.set_move_with(null);
 	}
 	else
@@ -138,7 +138,7 @@ player_t.prototype.loop=function(simulation,dt,level)
 			this.spr=this.spr_idle;
 		}
 
-		this.spr.x_scale=this.direction;
+		this.spr.x_scale=this.dir;
 	}
 };
 

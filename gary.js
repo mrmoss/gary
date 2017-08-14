@@ -6,7 +6,7 @@ function gary_t(x,y)
 	this.height=0;
 	this.spr=new sprite_t('gary.png',2);
 	this.spr_eye=new sprite_t('eye.png',1);
-	this.direction=1;
+	this.dir=1;
 
 	this.eyes=[new gary_eye_t(this),new gary_eye_t(this)];
 	this.eyes[0].xoff=-3;
@@ -167,9 +167,9 @@ function gary_segment_t(tenticle,parent,num)
 	this.y=0;
 }
 
-gary_segment_t.prototype.muscle_direction=function()
+gary_segment_t.prototype.muscle_dir=function()
 {
-	return (this.left_muscle.length+this.right_muscle.length)/2.0;
+	return (this.left_muscle.length+this.right_muscle.length)/4.0;
 };
 
 gary_segment_t.prototype.loop=function(dt)
@@ -177,14 +177,14 @@ gary_segment_t.prototype.loop=function(dt)
 	if(this.parent)
 	{
 		var origin_dir=this.parent.dir;
-		var origin_dist=this.parent.muscle_direction()/2.0;
+		var origin_dist=this.parent.muscle_dir()
 		var origin_x=this.parent.xoff+Math.cos(origin_dir)*origin_dist;
 		var origin_y=this.parent.yoff+Math.sin(origin_dir)*origin_dist;
 
 		this.dir=this.parent.dir+Math.atan2(this.left_muscle.length-this.right_muscle.length,this.thickness);
 
-		this.xoff=origin_x+Math.cos(this.dir)*this.muscle_direction()/2.0;
-		this.yoff=origin_y+Math.sin(this.dir)*this.muscle_direction()/2.0;
+		this.xoff=origin_x+Math.cos(this.dir)*this.muscle_dir();
+		this.yoff=origin_y+Math.sin(this.dir)*this.muscle_dir();
 	}
 
 	this.x=this.tenticle.x+this.xoff;
@@ -269,12 +269,12 @@ gary_eye_t.prototype.loop=function(simulation,dt,level)
 {
 	var dists=this.calculate_dists();
 
-	var direction=point_direction(dists.x,dists.y,level.player.x,level.player.y);
+	var dir=point_direction(dists.x,dists.y,level.player.x,level.player.y);
 
 	var dist=Math.min(this.max_dist,point_distance(dists.x,dists.y,level.player.x,level.player.y)/50.0);
 
-	this.xlook=dist*Math.cos(direction);
-	this.ylook=dist*Math.sin(direction);
+	this.xlook=dist*Math.cos(dir);
+	this.ylook=dist*Math.sin(dir);
 }
 
 gary_eye_t.prototype.draw=function(simulation)

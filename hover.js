@@ -7,7 +7,7 @@ function hover_t(x,y)
 	this.spr=new sprite_t('hover.png',4);
 	this.animation_speed=10;
 	this.speed=20;
-	this.direction=-1;
+	this.dir=-1;
 	this.start_pos=x;
 	this.max_dist=128;
 	this.move_with=null;
@@ -22,14 +22,14 @@ hover_t.prototype.loop=function(simulation,dt,level)
 	this.height=this.spr.height;
 	this.spr.frame+=this.animation_speed*dt;
 
-	this.x+=this.speed*this.direction*dt;
+	this.x+=this.speed*this.dir*dt;
 	if(this.move_with)
-		this.move_with.x+=this.speed*this.direction*dt;
+		this.move_with.x+=this.speed*this.dir*dt;
 
 	if(this.x>this.start_pos+this.max_dist/2)
-		this.direction=-1;
+		this.dir=-1;
 	if(this.x<this.start_pos-this.max_dist/2)
-		this.direction=1;
+		this.dir=1;
 }
 
 hover_t.prototype.draw=function(simulation)
