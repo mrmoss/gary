@@ -3,6 +3,20 @@ var kb_up=38;
 var kb_right=39;
 var kb_down=40;
 
+function point_direction(x1,y1,x2,y2)
+{
+	return Math.atan2(x1-x2,y2-y1)+Math.PI/2.0
+}
+
+function point_distance(x1,y1,x2,y2)
+{
+	var dx=Math.abs(x2-x1);
+	dx=dx*dx;
+	var dy=Math.abs(y2-y1);
+	dy=dy*dy;
+	return Math.sqrt(dx+dy);
+}
+
 function check_collision_pos(obj1,x,y,obj2)
 {
 	return (x+obj1.width>obj2.x&&
