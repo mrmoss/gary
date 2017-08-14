@@ -92,7 +92,7 @@ function gary_tenticle_t(gary,xoff,yoff,dir,dir_multiplier)
 	this.target_max=200;
 	this.target_inc=1000*dir_multiplier;
 
-	var num_segments=9;
+	var num_segments=15;
 	var thickness=8;
 	var total_length=0;
 	var parent=null;
