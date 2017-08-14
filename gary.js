@@ -17,11 +17,11 @@ function gary_t(x,y)
 	this.eyes[1].max_dist=2.5;
 
 	this.tenticles=[];
-	this.tenticles.push(new gary_tenticle_t(this, 18,-10,0,-1));
-	//this.tenticles.push(new gary_tenticle_t(this, 15,-20,-Math.PI/4,1));
-	//
-	//this.tenticles.push(new gary_tenticle_t(this,-18,-10,Math.PI,1));
-	//this.tenticles.push(new gary_tenticle_t(this,-15,-20,-3*Math.PI/4,-1));
+	this.tenticles.push(new gary_tenticle_t(this, 18,-10,0,1));
+	this.tenticles.push(new gary_tenticle_t(this, 15,-20,-Math.PI/4,-1));
+
+	this.tenticles.push(new gary_tenticle_t(this,-18,-10,Math.PI,1));
+	this.tenticles.push(new gary_tenticle_t(this,-15,-20,-3*Math.PI/4,-1));
 };
 
 gary_t.prototype.loop=function(simulation,dt,level)
@@ -44,25 +44,25 @@ gary_t.prototype.draw=function(simulation)
 	if(!simulation)
 		return;
 
-	for(var ii=0;ii<this.tenticles.length;++ii)
-		this.tenticles[ii].draw(simulation);
-
 	var spr_width=this.spr.width*this.spr.x_scale;
 
-	//simulation.ctx.save();
-	//simulation.ctx.translate(this.x-spr_width/2.0,this.y);
-	//this.spr.frame=1;
-	//this.spr.draw(simulation);
-	//simulation.ctx.restore();
+	simulation.ctx.save();
+	simulation.ctx.translate(this.x-spr_width/2.0,this.y);
+	this.spr.frame=1;
+	this.spr.draw(simulation);
+	simulation.ctx.restore();
 
-	//for(var ii=0;ii<this.eyes.length;++ii)
-	//	this.eyes[ii].draw(simulation);
+	for(var ii=0;ii<this.eyes.length;++ii)
+		this.eyes[ii].draw(simulation);
 
-	//simulation.ctx.save();
-	//simulation.ctx.translate(this.x-spr_width/2.0,this.y);
-	//this.spr.frame=0;
-	//this.spr.draw(simulation);
-	//simulation.ctx.restore();
+	simulation.ctx.save();
+	simulation.ctx.translate(this.x-spr_width/2.0,this.y);
+	this.spr.frame=0;
+	this.spr.draw(simulation);
+	simulation.ctx.restore();
+
+	for(var ii=0;ii<this.tenticles.length;++ii)
+		this.tenticles[ii].draw(simulation);
 };
 
 //http://www.zarkonnen.com/airships/tentacle_logic
@@ -72,14 +72,13 @@ function gary_tenticle_t(gary,xoff,yoff,dir,dir_multiplier)
 
 	this.xoff=xoff;
 	this.yoff=yoff;
-	this.dir=dir;
 
 	if(!this.xoff)
 		this.xoff=0;
 	if(!this.yoff)
 		this.yoff=0;
-	if(!this.dir)
-		this.dir=0;
+	if(!dir)
+		dir=0;
 	if(!dir_multiplier)
 		dir_multiplier=1;
 
@@ -101,16 +100,17 @@ function gary_tenticle_t(gary,xoff,yoff,dir,dir_multiplier)
 	for(var ii=0;ii<num_segments;++ii)
 	{
 		var length=8-ii/2.0;
-		parent=new gary_segment_t(this,parent);
+		parent=new gary_segment_t(this,parent,ii);
 
+		parent.dir=dir;
 		parent.thickness=thickness;
 		parent.left_muscle=new gary_muscle_t(length/2.0,length);
 		parent.right_muscle=new gary_muscle_t(length/2.0,length);
 		parent.xoff=total_length;
-		parent.target_angle=Math.PI/2.0/num_segments*ii*dir_multiplier;
+		parent.target_dir=Math.PI/2.0/num_segments*ii*dir_multiplier;
 		this.segments.push(parent);
 
-		thickness=thickness*0.8;
+		thickness=thickness*0.92;
 		total_length+=length;
 	}
 
@@ -151,17 +151,18 @@ gary_tenticle_t.prototype.draw=function(simulation)
 		this.segments[ii].draw(simulation);
 }
 
-function gary_segment_t(tenticle,parent)
+function gary_segment_t(tenticle,parent,num)
 {
 	this.tenticle=tenticle;
+	this.parent=parent;
+	this.num=num;
+	this.dir=0;
 	this.thickness=0;
 	this.left_muscle=null;
 	this.right_muscle=null;
 	this.xoff=0;
 	this.yoff=0;
-	this.angle=0;
-	this.target_angle=0;
-	this.parent=parent;
+	this.target_dir=0;
 	this.x=0;
 	this.y=0;
 }
@@ -173,52 +174,36 @@ gary_segment_t.prototype.muscle_direction=function()
 
 gary_segment_t.prototype.loop=function(dt)
 {
-	this.x=this.tenticle.x;
-	this.y=this.tenticle.y;
-
 	if(this.parent)
 	{
-		var origin_x=this.parent.xoff+Math.cos(this.parent.angle)*this.parent.muscle_direction()/2.0;
-		var origin_y=this.parent.yoff+Math.sin(this.parent.angle)*this.parent.muscle_direction()/2.0;
-		var relative_angle=Math.atan2(this.left_muscle.length-this.right_muscle.length,this.thickness);
-		this.angle=this.parent.angle+relative_angle;
-		this.xoff=origin_x+Math.cos(this.angle)*this.muscle_direction()/2.0;
-		this.yoff=origin_y+Math.sin(this.angle)*this.muscle_direction()/2.0;
+		var origin_dir=this.parent.dir;
+		var origin_dist=this.parent.muscle_direction()/2.0;
+		var origin_x=this.parent.xoff+Math.cos(origin_dir)*origin_dist;
+		var origin_y=this.parent.yoff+Math.sin(origin_dir)*origin_dist;
+
+		this.dir=this.parent.dir+Math.atan2(this.left_muscle.length-this.right_muscle.length,this.thickness);
+
+		this.xoff=origin_x+Math.cos(this.dir)*this.muscle_direction()/2.0;
+		this.yoff=origin_y+Math.sin(this.dir)*this.muscle_direction()/2.0;
 	}
+
+	this.x=this.tenticle.x+this.xoff;
+	this.y=this.tenticle.y+this.yoff;
 };
 
 gary_segment_t.prototype.draw=function(simulation)
 {
 	simulation.ctx.save();
+	simulation.ctx.translate(this.x,this.y);
 
-	//simulation.ctx.translate(this.x,this.y);
-	//simulation.ctx.rotate(this.tenticle.dir);
-	//simulation.ctx.translate(this.xoff,this.yoff);
-	//simulation.ctx.rotate(this.angle);
-
-	var real_x=0;
-	var real_y=0;
-
-	//var dist=point_distance(0,0,this.xoff,this.yoff);
-	//var dir=this.tenticle.dir+this.angle;
-	//real_x=this.x+Math.cos(dir)*dist;
-	//real_y=this.y+Math.sin(dir)*dist;
-
-	real_x=this.x+this.xoff;
-	real_y=this.y+this.yoff;
-
-	//var x=-this.muscle_direction();
-	//var y=-this.thickness/2.0;
-	//var w=this.muscle_direction()+2;
-	//var h=this.thickness;
-	//var border=1;
-
-	//simulation.ctx.fillStyle="#000000";
-	//simulation.ctx.fillRect(x,y,w,h);
-	simulation.ctx.fillStyle="#667331";
-	//simulation.ctx.fillRect(x,y+border/2,w,h-border);
+	simulation.ctx.fillStyle="#000000";
 	simulation.ctx.beginPath();
-	simulation.ctx.arc(real_x,real_y,(this.muscle_direction()+2)/2,0,2*Math.PI,false);
+	simulation.ctx.arc(0,0,this.thickness/2,0,2*Math.PI,false);
+	simulation.ctx.fill();
+
+	simulation.ctx.fillStyle="#667331";
+	simulation.ctx.beginPath();
+	simulation.ctx.arc(0,0,(this.thickness-1)/2,0,2*Math.PI,false);
 	simulation.ctx.fill();
 
 	simulation.ctx.restore();
@@ -226,17 +211,17 @@ gary_segment_t.prototype.draw=function(simulation)
 
 gary_segment_t.prototype.target=function(x,y)
 {
-	var current_angle=normalize_radians(normalize_radians(Math.atan2(y-this.yoff,x-this.xoff))-this.angle);
-	var angle_difference=normalize_radians(current_angle-this.target_angle);
+	var current_dir=normalize_radians(normalize_radians(Math.atan2(y-this.yoff,x-this.xoff))-this.dir);
+	var dir_difference=normalize_radians(current_dir-this.target_dir);
 
-	if(angle_difference<Math.PI)
+	if(dir_difference<Math.PI)
 	{
-		var muscle_ratio=Math.min(0.15,angle_difference/Math.PI/2.0);
+		var muscle_ratio=Math.min(0.15,dir_difference/Math.PI/2.0);
 		this.right_muscle.length=this.right_muscle.length*(1-muscle_ratio)+this.right_muscle.min_length*muscle_ratio;
 	}
 	else
 	{
-		var muscle_ratio=Math.min(0.15,(2-angle_difference/Math.PI)/2.0);
+		var muscle_ratio=Math.min(0.15,(2-dir_difference/Math.PI)/2.0);
 		this.left_muscle.length=this.left_muscle.length*(1-muscle_ratio)+this.left_muscle.min_length*muscle_ratio;
 	}
 };
