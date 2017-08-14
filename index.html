@@ -11,7 +11,7 @@
 		<script src='sprite.js'></script>
 		<script>
 
-			var simulation;
+			var simulation=null;
 
 			function init()
 			{
@@ -33,6 +33,7 @@
 			function loop(dt)
 			{
 				level.loop(simulation,dt);
+
 			}
 
 			function draw()

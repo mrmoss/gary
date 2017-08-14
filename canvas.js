@@ -17,6 +17,15 @@ function point_distance(x1,y1,x2,y2)
 	return Math.sqrt(dx+dy);
 }
 
+function normalize_radians(radians)
+{
+	while(radians<0)
+		radians+=Math.PI*2;
+	while(radians>=Math.PI*2)
+		radians-=Math.PI*2;
+	return radians;
+}
+
 function check_collision_pos(obj1,x,y,obj2)
 {
 	return (x+obj1.width>obj2.x&&
