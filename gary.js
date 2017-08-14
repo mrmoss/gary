@@ -6,7 +6,6 @@ function gary_t(x,y)
 	this.height=0;
 	this.spr=new sprite_t('gary.png',2);
 	this.spr_eye=new sprite_t('eye.png',1);
-	this.spr_tenticle=new sprite_t('tenticle.png',1);
 	this.direction=1;
 
 	this.eyes=[new gary_eye(this),new gary_eye(this)];
@@ -17,8 +16,43 @@ function gary_t(x,y)
 	this.eyes[1].yoff=-16.5;
 	this.eyes[1].max_dist=2.5;
 
-	this.tenticle=new tenticle_t(this);
+	this.tenticles=[];
+	this.tenticles.push(new tenticle_t(this, 18,-10,0,-1));
+	this.tenticles.push(new tenticle_t(this, 15,-20,-Math.PI/4,1));
+
+	this.tenticles.push(new tenticle_t(this,-18,-10,Math.PI,1));
+	this.tenticles.push(new tenticle_t(this,-15,-20,-3*Math.PI/4,-1));
+
+	//this.tenticles.push(this.make_tenticle(8,10,-10,Math.PI/4.0,1));
+	//this.tenticles.push(this.make_tenticle(8,-10,-10,Math.PI/4.0*4,-1));
+	//this.tenticles.push(this.make_tenticle(10,0,-10,-Math.PI/4.0,1));
+	//this.tenticles.push(this.make_tenticle(10,0,-10,-Math.PI/4.0*4,-1));
 };
+
+//gary_t.prototype.make_tenticle=function(count,xoff,yoff,dir,inc_dir)
+//{
+//	var tenticle=new tenticle_t(this,0);
+//	tenticle.xoff=xoff;
+//	tenticle.yoff=yoff;
+//	tenticle.dist=0;
+//	tenticle.dir_dir=inc_dir;
+//
+//	var parent=tenticle;
+//	var dir_off=0;
+//	var dir_inc=0.4*inc_dir;
+//	var wrap=-1;
+//	for(var ii=0;ii<count;++ii)
+//	{
+//		dir_off+=dir_inc*wrap;
+//		if(Math.abs(dir_off)>1)
+//			wrap=-wrap;
+//		parent.child=new tenticle_t(parent,dir+dir_off);
+//		parent.child.dir_dir=inc_dir;
+//		parent=parent.child;
+//	}
+//
+//	return tenticle;
+//}
 
 gary_t.prototype.loop=function(simulation,dt,level)
 {
@@ -31,10 +65,8 @@ gary_t.prototype.loop=function(simulation,dt,level)
 	for(var ii=0;ii<this.eyes.length;++ii)
 		this.eyes[ii].loop(simulation,dt,level);
 
-
-	this.tenticle.target_x=level.player.x;
-	this.tenticle.target_y=level.player.y-level.player.height/2;
-	this.tenticle.loop(simulation,dt,level);
+	for(var ii=0;ii<this.tenticles.length;++ii)
+		this.tenticles[ii].loop(simulation,dt,level);
 };
 
 gary_t.prototype.draw=function(simulation)
@@ -42,7 +74,8 @@ gary_t.prototype.draw=function(simulation)
 	if(!simulation)
 		return;
 
-	this.tenticle.draw(simulation);
+	for(var ii=0;ii<this.tenticles.length;++ii)
+		this.tenticles[ii].draw(simulation);
 
 	var spr_width=this.spr.width*this.spr.x_scale;
 
@@ -124,7 +157,61 @@ gary_eye.prototype.draw=function(simulation)
 
 
 
-
+//function tenticle_t(parent,dir)
+//{
+//	this.parent=parent;
+//	this.child=null;
+//	this.spr=new sprite_t('tenticle.png',1);
+//	this.target_x=null;
+//	this.target_y=null;
+//	this.xoff=0;
+//	this.yoff=0;
+//	this.dir=dir;
+//	this.dist=8;
+//
+//	this.dir=dir;
+//	this.dir_off=0;
+//	this.dir_dir=1;
+//	this.dir_inc=0.05;
+//	this.dir_max=2;
+//}
+//
+//tenticle_t.prototype.loop=function(simulation,dt,level)
+//{
+//	this.target_x=level.player.x;
+//	this.target_y=level.player.y-level.player.height/2;
+//
+//	this.x=this.parent.x+this.xoff+Math.cos(this.dir)*this.dist+Math.cos(this.dir_off)*3;
+//	this.y=this.parent.y+this.yoff+Math.sin(this.dir)*this.dist+Math.sin(this.dir_off)*3;
+//
+//	this.dir_off+=this.dir_inc*this.dir_dir*80*dt;
+//
+//	//if(this.dir_off>=this.dir_max||this.dir_off<=-this.dir_max)
+//	if(this.dist==0&&Math.random()>0.99)
+//	{
+//		this.dir_inc=-this.dir_inc;
+//		var child=this.child;
+//		while(child)
+//		{
+//			child.dir_inc=-child.dir_inc;
+//			child=child.child;
+//		}
+//	}
+//
+//	if(this.child)
+//		this.child.loop(simulation,dt,level);
+//}
+//
+//tenticle_t.prototype.draw=function(simulation)
+//{
+//	simulation.ctx.save();
+//	simulation.ctx.translate(this.x-this.spr.width/2.0,this.y+this.spr.height/2.0);
+//	this.spr.draw(simulation);
+//	simulation.ctx.restore();
+//
+//	if(this.child)
+//		this.child.draw(simulation);
+//}
 
 
 
@@ -166,7 +253,7 @@ segment_t.prototype.muscle_direction=function()
 {
 	return (this.left_muscle.length+this.right_muscle.length)/2.0;
 };
-segment_t.prototype.updatePosition=function(previous)
+segment_t.prototype.update=function(previous)
 {
 	var origin_x=previous.x_center+Math.cos(previous.angle)*previous.muscle_direction()/2.0;
 	var origin_y=previous.y_center+Math.sin(previous.angle)*previous.muscle_direction()/2.0;
@@ -198,24 +285,39 @@ segment_t.prototype.target=function(x,y)
 
 
 //http://www.zarkonnen.com/airships/tentacle_logic
-function tenticle_t(gary)
+function tenticle_t(gary,xoff,yoff,dir,dir_multiplier)
 {
 	this.gary=gary;
 
-	this.xoff=10;
-	this.yoff=-10;
+	this.xoff=xoff;
+	this.yoff=yoff;
+	this.dir=dir;
+
+	if(!this.xoff)
+		this.xoff=0;
+	if(!this.yoff)
+		this.yoff=0;
+	if(!this.dir)
+		this.dir=0;
+	if(!dir_multiplier)
+		dir_multiplier=1;
 
 	this.segments=[];
-	this.target_x=null;
-	this.target_y=null;
+	this.target_x=0;
+	this.target_y=0;
+	this.target_off=0;
+	this.target_max=200;
+	this.target_inc=1000*dir_multiplier;
 
 	var total_length=0;
-	var num_segments=10;
+	var num_segments=15;
+	var size=10;
 	for(var ii=0;ii<num_segments;++ii)
 	{
-		var thickness=(num_segments-ii)*2;
-		var length=10-ii/2.0;
-		var target_angle=Math.PI/2.0/num_segments*ii;
+		var thickness=size;
+		size=size*0.8;
+		var length=8-ii/2.0;
+		var target_angle=Math.PI/2.0/num_segments*ii*dir_multiplier;
 		var left_muscle=new muscle_t(length/2.0,length);
 		var right_muscle=new muscle_t(length/2.0,length);
 		this.segments.push(new segment_t(thickness,left_muscle,right_muscle,total_length,0,0,target_angle));
@@ -226,6 +328,20 @@ function tenticle_t(gary)
 
 tenticle_t.prototype.loop=function(simulation,dt,level)
 {
+		this.target_x=this.gary.x;
+		this.target_y=this.gary.y+this.target_off;
+		this.target_off+=this.target_inc*dt;
+		if(this.target_off>this.target_max)
+		{
+			this.target_off=this.target_max;
+			this.target_inc=-Math.abs(this.target_inc);
+		}
+		if(this.target_off<-this.target_max)
+		{
+			this.target_off=-this.target_max;
+			this.target_inc=Math.abs(this.target_inc);
+		}
+
 	for(var ii=0;ii<this.segments.length;++ii)
 	{
 		this.segments[ii].left_muscle.relax();
@@ -233,7 +349,7 @@ tenticle_t.prototype.loop=function(simulation,dt,level)
 		if(this.target_x!=null&&this.target_y!=null)
 			this.segments[ii].target(this.target_x-this.gary.x-this.xoff,this.target_y-this.gary.y-this.yoff);
 		if(ii>0)
-			this.segments[ii].updatePosition(this.segments[ii-1]);
+			this.segments[ii].update(this.segments[ii-1]);
 	}
 }
 
@@ -241,10 +357,12 @@ tenticle_t.prototype.draw=function(simulation)
 {
 	simulation.ctx.save();
 	simulation.ctx.translate(this.gary.x+this.xoff,this.gary.y+this.yoff);
+	simulation.ctx.rotate(this.dir);
 
 	for(var ii=0;ii<this.segments.length;++ii)
 	{
 		simulation.ctx.save();
+
 		simulation.ctx.translate(this.segments[ii].x_center,this.segments[ii].y_center);
 		simulation.ctx.rotate(this.segments[ii].angle);
 
