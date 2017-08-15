@@ -2,6 +2,7 @@ var kb_left=37;
 var kb_up=38;
 var kb_right=39;
 var kb_down=40;
+var kb_space=32;
 
 function point_direction(x1,y1,x2,y2)
 {

@@ -57,6 +57,13 @@ player_t.prototype.loop=function(simulation,dt,level)
 
 		this.spr.x_scale=this.dir;
 	}
+
+	if(simulation.keys_pressed[kb_space])
+	{
+		var bullet=new bullet_t(this.x+8*this.dir,this.y-8);
+		bullet.dir=this.dir;
+		level.bullets.push(bullet);
+	}
 };
 
 player_t.prototype.draw=function(simulation)

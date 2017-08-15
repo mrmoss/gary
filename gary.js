@@ -200,6 +200,9 @@ gary_segment_t.prototype.muscle_dir=function()
 
 gary_segment_t.prototype.loop=function(simulation,dt,level)
 {
+	this.width=this.thickness;
+	this.height=this.thickness;
+
 	if(this.parent)
 	{
 		var origin_dir=this.parent.dir;
@@ -219,7 +222,7 @@ gary_segment_t.prototype.loop=function(simulation,dt,level)
 	var center_offset=-this.thickness/2;
 	var check_x=this.x+level.player.width/2.0+center_offset
 	var check_y=this.y-center_offset;
-	if(check_collision_pos({width:this.thickness,height:this.thickness},check_x,check_y,level.player))
+	if(check_collision_pos(this,check_x,check_y,level.player))
 		this.color='red';
 	else
 		this.color=this.orig_color;
