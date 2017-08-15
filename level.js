@@ -25,7 +25,8 @@ function level_t(simulation)
 
 	this.hovers.push(new hover_t(canvas_width/2+crate_size*2,crate_start_y-crate_size*3.5));
 
-	this.player=new player_t(canvas_width/2+crate_size*2,0);
+	//this.player=new player_t(canvas_width/2+crate_size*2,0);
+	this.player=new player_t(70,crate_start_y-crate_size*6);
 	this.garys.push(new gary_t(93,crate_start_y-crate_size*6));
 }
 

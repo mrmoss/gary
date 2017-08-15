@@ -90,7 +90,7 @@ function gary_tenticle_t(gary,xoff,yoff,dir,dir_multiplier)
 	this.target_y=0;
 	this.target_off=0;
 	this.target_max=200;
-	this.target_inc=1000*dir_multiplier;
+	this.target_inc=900*dir_multiplier;
 
 	var num_segments=15;
 	var thickness=8;
@@ -199,7 +199,10 @@ gary_segment_t.prototype.loop=function(simulation,dt,level)
 	this.x=this.tenticle.x+this.xoff;
 	this.y=this.tenticle.y+this.yoff;
 
-	if(check_collision_pos({width:this.thickness,height:this.thickness},this.x+level.player.width/2.0,this.y,level.player))
+	var center_offset=-this.thickness/2;
+	var check_x=this.x+level.player.width/2.0+center_offset
+	var check_y=this.y-center_offset;
+	if(check_collision_pos({width:this.thickness,height:this.thickness},check_x,check_y,level.player))
 		this.color='red';
 	else
 		this.color=this.orig_color;
@@ -210,14 +213,12 @@ gary_segment_t.prototype.draw=function(simulation)
 	simulation.ctx.save();
 	simulation.ctx.translate(this.x,this.y);
 
-	simulation.ctx.fillStyle="#000000";
-	simulation.ctx.beginPath();
-	simulation.ctx.arc(0,0,this.thickness/2,0,2*Math.PI,false);
-	simulation.ctx.fill();
-
+	simulation.ctx.stokeStyle="#000000";
+	simulation.ctx.lineWidth=1.7;
 	simulation.ctx.fillStyle=this.color;
 	simulation.ctx.beginPath();
-	simulation.ctx.arc(0,0,(this.thickness-1)/2,0,2*Math.PI,false);
+	simulation.ctx.arc(0,0,(this.thickness-simulation.ctx.lineWidth)/2,0,2*Math.PI,false);
+	simulation.ctx.stroke();
 	simulation.ctx.fill();
 
 	simulation.ctx.restore();
