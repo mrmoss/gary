@@ -10,7 +10,24 @@ function hover_t(x,y)
 	this.dir=-1;
 	this.start_pos=x;
 	this.max_dist=128;
-	this.move_with=null;
+	this.move_with=[];
+}
+
+hover_t.prototype.remove_move_with=function(object)
+{
+	if(!object)
+		return;
+	var new_move_with=[];
+	for(var ii=0;ii<this.move_with.length;++ii)
+		if(!(this.move_with[ii]===object))
+			new_move_with.push(this.move_with[ii]);
+	this.move_with=new_move_with;
+}
+
+hover_t.prototype.add_move_with=function(object)
+{
+	if(object)
+		this.move_with.push(object);
 }
 
 hover_t.prototype.loop=function(simulation,dt,level)
@@ -23,8 +40,9 @@ hover_t.prototype.loop=function(simulation,dt,level)
 	this.spr.frame+=this.animation_speed*dt;
 
 	this.x+=this.speed*this.dir*dt;
-	if(this.move_with)
-		this.move_with.x+=this.speed*this.dir*dt;
+	for(var ii=0;ii<this.move_with.length;++ii)
+		if(this.move_with[ii])
+			this.move_with[ii].parent.x+=this.speed*this.dir*dt;
 
 	if(this.x>this.start_pos+this.max_dist/2)
 		this.dir=-1;

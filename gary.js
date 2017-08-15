@@ -8,11 +8,13 @@ function gary_t(x,y)
 	this.spr_eye=new sprite_t('eye.png',1);
 	this.dir=1;
 
+	this.physics=new physics_t(this);
+
 	this.eyes=[new gary_eye_t(this),new gary_eye_t(this)];
-	this.eyes[0].xoff=-3;
+	this.eyes[0].xoff=-2;
 	this.eyes[0].yoff=-35;
 	this.eyes[0].max_dist=2;
-	this.eyes[1].xoff=0;
+	this.eyes[1].xoff=1;
 	this.eyes[1].yoff=-16.5;
 	this.eyes[1].max_dist=2.5;
 
@@ -31,11 +33,19 @@ gary_t.prototype.loop=function(simulation,dt,level)
 	this.width=22;
 	this.height=this.spr.height;
 
+	this.physics.loop(simulation,dt,level);
+
 	//Getto animation hack
 	var dir=1;
 	if(this.tenticles[0].target_inc<0)
 		dir=-1;
-	this.x+=4*dir*dt;
+
+	//Dumb AI
+	var move_dir=1;
+	if(level.player.x<this.x)
+		move_dir=-1;
+	this.physics.set_new_x(10*move_dir*dt);
+
 	this.spr.x_scale=1.0-this.tenticles[0].target_inc/this.tenticles[0].target_max*dt/5;
 	this.spr.y_scale=1.0+this.tenticles[0].target_inc/this.tenticles[0].target_max*dt/5;
 
