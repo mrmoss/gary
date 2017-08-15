@@ -20,7 +20,7 @@ player_t.prototype.loop=function(simulation,dt,level)
 	if(!simulation)
 		return;
 
-	this.width=20;
+	this.width=10;
 	this.height=Math.max(this.spr_idle.height,this.spr_move.height,this.spr_jump.height);
 
 	this.physics.loop(simulation,dt,level);

@@ -52,13 +52,13 @@ level_t.prototype.loop=function(simulation,dt)
 
 level_t.prototype.draw=function(simulation)
 {
-	this.player.draw(simulation);
 	for(var ii=0;ii<this.garys.length;++ii)
 		this.garys[ii].draw(simulation);
+	for(var ii=0;ii<this.bullets.length;++ii)
+		this.bullets[ii].draw(simulation);
+	this.player.draw(simulation);
 	for(var ii=0;ii<this.crates.length;++ii)
 		this.crates[ii].draw(simulation);
 	for(var ii=0;ii<this.hovers.length;++ii)
 		this.hovers[ii].draw(simulation);
-	for(var ii=0;ii<this.bullets.length;++ii)
-		this.bullets[ii].draw(simulation);
 }
