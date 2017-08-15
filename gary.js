@@ -30,7 +30,7 @@ gary_t.prototype.loop=function(simulation,dt,level)
 	if(!simulation)
 		return;
 
-	this.width=22;
+	this.width=29;
 	this.height=this.spr.height;
 
 	this.physics.loop(simulation,dt,level);
@@ -64,10 +64,10 @@ gary_t.prototype.draw=function(simulation)
 	for(var ii=0;ii<this.tenticles.length;++ii)
 		this.tenticles[ii].draw(simulation);
 
-	var spr_width=this.spr.width*this.spr.x_scale;
+	var spr_xoff=this.spr.width/2.0*this.spr.x_scale;
 
 	simulation.ctx.save();
-	simulation.ctx.translate(this.x-spr_width/2.0,this.y);
+	simulation.ctx.translate(this.x-spr_xoff,this.y);
 	this.spr.frame=1;
 	this.spr.draw(simulation);
 	simulation.ctx.restore();
@@ -76,7 +76,7 @@ gary_t.prototype.draw=function(simulation)
 		this.eyes[ii].draw(simulation);
 
 	simulation.ctx.save();
-	simulation.ctx.translate(this.x-spr_width/2.0,this.y);
+	simulation.ctx.translate(this.x-spr_xoff,this.y);
 	this.spr.frame=0;
 	this.spr.draw(simulation);
 	simulation.ctx.restore();
