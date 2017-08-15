@@ -31,6 +31,14 @@ gary_t.prototype.loop=function(simulation,dt,level)
 	this.width=22;
 	this.height=this.spr.height;
 
+	//Getto animation hack
+	var dir=1;
+	if(this.tenticles[0].target_inc<0)
+		dir=-1;
+	this.x+=4*dir*dt;
+	this.spr.x_scale=1.0-this.tenticles[0].target_inc/this.tenticles[0].target_max*dt/5;
+	this.spr.y_scale=1.0+this.tenticles[0].target_inc/this.tenticles[0].target_max*dt/5;
+
 	for(var ii=0;ii<this.eyes.length;++ii)
 		this.eyes[ii].loop(simulation,dt,level);
 
