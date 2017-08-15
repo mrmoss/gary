@@ -19,9 +19,8 @@ function gary_t(x,y)
 	this.tenticles=[];
 	this.tenticles.push(new gary_tenticle_t(this, 18,-10,0,1));
 	this.tenticles.push(new gary_tenticle_t(this, 15,-20,-Math.PI/4,-1));
-
 	this.tenticles.push(new gary_tenticle_t(this,-18,-10,Math.PI,1));
-	this.tenticles.push(new gary_tenticle_t(this,-15,-20,-3*Math.PI/4,-1));
+	this.tenticles.push(new gary_tenticle_t(this,-15,-22,-3*Math.PI/4,-1));
 };
 
 gary_t.prototype.loop=function(simulation,dt,level)
@@ -44,6 +43,9 @@ gary_t.prototype.draw=function(simulation)
 	if(!simulation)
 		return;
 
+	for(var ii=0;ii<this.tenticles.length;++ii)
+		this.tenticles[ii].draw(simulation);
+
 	var spr_width=this.spr.width*this.spr.x_scale;
 
 	simulation.ctx.save();
@@ -60,9 +62,6 @@ gary_t.prototype.draw=function(simulation)
 	this.spr.frame=0;
 	this.spr.draw(simulation);
 	simulation.ctx.restore();
-
-	for(var ii=0;ii<this.tenticles.length;++ii)
-		this.tenticles[ii].draw(simulation);
 };
 
 //http://www.zarkonnen.com/airships/tentacle_logic
