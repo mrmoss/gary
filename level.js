@@ -17,9 +17,9 @@ function level_t(simulation)
 
 	this.garys.push(new gary_t(50,crate_start_y-crate_size*6));
 
-	this.breakables.push(new breakable_t(canvas_width/2-crate_size*4,crate_start_y-crate_size*5,new sprite_t('urn.png',3,true)));
-	this.breakables.push(new breakable_t(canvas_width/2+crate_size*2,0,new sprite_t('urn.png',3,true)));
-	this.breakables.push(new breakable_t(canvas_width/2+crate_size*6,crate_start_y-crate_size,new sprite_t('urn.png',3,true)));
+	this.breakables.push(new breakable_t(canvas_width/2-crate_size*4,crate_start_y-crate_size*5,new sprite_t('urn.png',4,true)));
+	this.breakables.push(new breakable_t(canvas_width/2+crate_size*2,0,new sprite_t('urn.png',4,true)));
+	this.breakables.push(new breakable_t(canvas_width/2+crate_size*6,crate_start_y-crate_size,new sprite_t('urn.png',4,true)));
 
 	this.player=new player_t(canvas_width/2+crate_size*2,0);
 
