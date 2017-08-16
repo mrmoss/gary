@@ -26,19 +26,22 @@ bullet_t.prototype.loop=function(simulation,dt,level)
 	this.moved_dist+=Math.abs(this.speed*this.dir*dt);
 
 	var _this=this;
-	var collision_func=function(objects,centered)
+	var collision_func=function(objects,centered,cb)
 	{
 		if(!_this.destroy)
 			for(var ii=0;ii<objects.length;++ii)
-				if(check_collision_pos(_this,_this.x-_this.width/2+objects[ii].width/2*centered,_this.y,objects[ii]))
+				if(!objects[ii].broken&&check_collision_pos(_this,_this.x-_this.width/2+objects[ii].width/2*centered,_this.y,objects[ii]))
 				{
 					_this.destroy=true;
+					if(cb)
+						cb(objects[ii]);
 					break;
 				}
 	};
 
-	collision_func(level.crates,0);
-	collision_func(level.garys,1);
+	collision_func(level.crates,0,null);
+	collision_func(level.garys,1,null);
+	collision_func(level.breakables,1,function(other){other.shatter();});
 
 	//for(var ii=0;ii<level.garys.length;++ii)
 	//	for(var jj=0;jj<level.garys[ii].tenticles.length;++jj)
