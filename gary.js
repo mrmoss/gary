@@ -4,8 +4,8 @@ function gary_t(x,y)
 	this.y=y;
 	this.width=0;
 	this.height=0;
-	this.spr=new sprite_t('gary.png',2);
-	this.spr_eye=new sprite_t('eye.png',1);
+	this.spr=new sprite_t('gary.png',2,true);
+	this.spr_eye=new sprite_t('eye.png',1,true);
 	this.dir=1;
 
 	this.physics=new physics_t(this);
@@ -64,10 +64,8 @@ gary_t.prototype.draw=function(simulation)
 	for(var ii=0;ii<this.tenticles.length;++ii)
 		this.tenticles[ii].draw(simulation);
 
-	var spr_xoff=this.spr.width/2.0*this.spr.x_scale;
-
 	simulation.ctx.save();
-	simulation.ctx.translate(this.x-spr_xoff,this.y);
+	simulation.ctx.translate(this.x,this.y);
 	this.spr.frame=1;
 	this.spr.draw(simulation);
 	simulation.ctx.restore();
@@ -76,7 +74,7 @@ gary_t.prototype.draw=function(simulation)
 		this.eyes[ii].draw(simulation);
 
 	simulation.ctx.save();
-	simulation.ctx.translate(this.x-spr_xoff,this.y);
+	simulation.ctx.translate(this.x,this.y);
 	this.spr.frame=0;
 	this.spr.draw(simulation);
 	simulation.ctx.restore();
@@ -295,8 +293,6 @@ gary_eye_t.prototype.calculate_dists=function()
 	dists.gary_width=this.gary.spr.width*this.gary.spr.x_scale;
 	dists.x=this.gary.x+this.xoff;
 	dists.y=this.gary.y+this.yoff;
-	dists.spr_width=this.gary.spr_eye.width*this.gary.spr_eye.x_scale;
-	dists.spr_height=this.gary.spr_eye.height*this.gary.spr_eye.y_scale;
 	return dists;
 }
 
@@ -320,7 +316,7 @@ gary_eye_t.prototype.draw=function(simulation)
 	var dists=this.calculate_dists();
 
 	simulation.ctx.save();
-	simulation.ctx.translate(dists.x+this.xlook-dists.spr_width/2.0,dists.y+this.ylook-dists.spr_height/2.0);
+	simulation.ctx.translate(dists.x+this.xlook,dists.y+this.ylook);
 	this.gary.spr_eye.draw(simulation);
 	simulation.ctx.restore();
 }

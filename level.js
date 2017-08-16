@@ -17,9 +17,9 @@ function level_t(simulation)
 
 	this.garys.push(new gary_t(50,crate_start_y-crate_size*6));
 
-	this.breakables.push(new breakable_t(canvas_width/2-crate_size*4,crate_start_y-crate_size*5,new sprite_t('urn.png',3)));
-	this.breakables.push(new breakable_t(canvas_width/2+crate_size*2,0,new sprite_t('urn.png',3)));
-	this.breakables.push(new breakable_t(canvas_width/2+crate_size*6,crate_start_y-crate_size,new sprite_t('urn.png',3)));
+	this.breakables.push(new breakable_t(canvas_width/2-crate_size*4,crate_start_y-crate_size*5,new sprite_t('urn.png',3,true)));
+	this.breakables.push(new breakable_t(canvas_width/2+crate_size*2,0,new sprite_t('urn.png',3,true)));
+	this.breakables.push(new breakable_t(canvas_width/2+crate_size*6,crate_start_y-crate_size,new sprite_t('urn.png',3,true)));
 
 	this.player=new player_t(canvas_width/2+crate_size*2,0);
 
@@ -53,8 +53,9 @@ level_t.prototype.loop=function(simulation,dt)
 
 
 	var new_bullets=[];
+	var max_bullet_dist=1000;
 	for(var ii=0;ii<this.bullets.length;++ii)
-		if(this.bullets[ii].moved_dist<1000&&!this.bullets[ii].destroy)
+		if(this.bullets[ii].moved_dist<max_bullet_dist&&!this.bullets[ii].destroy)
 			new_bullets.push(this.bullets[ii]);
 	this.bullets=new_bullets;
 }
@@ -64,7 +65,8 @@ level_t.prototype.draw=function(simulation)
 	for(var ii=0;ii<this.garys.length;++ii)
 		this.garys[ii].draw(simulation);
 	for(var ii=0;ii<this.bullets.length;++ii)
-		this.bullets[ii].draw(simulation);
+		if(!this.bullets[ii].exploded)
+			this.bullets[ii].draw(simulation);
 	this.player.draw(simulation);
 	for(var ii=0;ii<this.crates.length;++ii)
 		this.crates[ii].draw(simulation);
@@ -72,4 +74,7 @@ level_t.prototype.draw=function(simulation)
 		this.breakables[ii].draw(simulation);
 	for(var ii=0;ii<this.hovers.length;++ii)
 		this.hovers[ii].draw(simulation);
+	for(var ii=0;ii<this.bullets.length;++ii)
+		if(this.bullets[ii].exploded)
+			this.bullets[ii].draw(simulation);
 }

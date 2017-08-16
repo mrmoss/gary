@@ -36,7 +36,7 @@ breakable_t.prototype.draw=function(simulation)
 		return;
 
 	simulation.ctx.save();
-	simulation.ctx.translate(this.x-this.spr.width/2.0*this.spr.x_scale,this.y);
+	simulation.ctx.translate(this.x,this.y);
 	this.spr.draw(simulation);
 	simulation.ctx.restore();
 }
