@@ -6,8 +6,9 @@ function breakable_t(x,y,spr)
 	this.height=0;
 	this.spr=spr;
 	this.broken=false;
-	this.animation_speed=8;
+	this.animation_speed=12;
 	this.physics=new physics_t(this);
+	this.will_break=false;
 }
 
 breakable_t.prototype.loop=function(simulation,dt,level)
@@ -28,6 +29,13 @@ breakable_t.prototype.loop=function(simulation,dt,level)
 	}
 
 	this.physics.loop(simulation,dt,level);
+
+	console.log(this.physics.y_velocity);
+	if(this.physics.y_velocity>5)
+		this.will_break=true;
+
+	if(!this.physics.is_falling()&&this.will_break)
+		this.shatter();
 }
 
 breakable_t.prototype.draw=function(simulation)
