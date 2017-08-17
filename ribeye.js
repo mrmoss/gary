@@ -24,7 +24,7 @@ ribeye_t.prototype.loop=function(simulation,dt,level)
 	if(!simulation)
 		return;
 
-	this.width=29;
+	this.width=20;
 	this.height=this.spr.height;
 
 	this.physics.loop(simulation,dt,level);
