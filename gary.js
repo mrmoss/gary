@@ -12,11 +12,12 @@ function gary_t(x,y)
 	this.physics=new physics_t(this);
 
 	this.eyes=[new eye_t(this),new eye_t(this)];
+	this.eyes_yoffs=[-37,-18];
 	this.eyes[0].xoff=-2;
-	this.eyes[0].yoff=-38.5;
+	this.eyes[0].yoff=this.eyes_yoffs[0];
 	this.eyes[0].max_dist=2;
 	this.eyes[1].xoff=1;
-	this.eyes[1].yoff=-19.5;
+	this.eyes[1].yoff=this.eyes_yoffs[1];
 	this.eyes[1].max_dist=2.5;
 
 	this.tenticles=[];
@@ -25,7 +26,7 @@ function gary_t(x,y)
 	this.tenticles.push(new gary_tenticle_t(this,-18,-10,Math.PI,1));
 	this.tenticles.push(new gary_tenticle_t(this,-15,-22,-3*Math.PI/4,-1));
 
-	this.pendulum=new pendulum_t(1200,200);
+	this.pendulum=new pendulum_t(1100,200);
 };
 
 gary_t.prototype.loop=function(simulation,dt,level)
@@ -56,7 +57,10 @@ gary_t.prototype.loop=function(simulation,dt,level)
 	this.physics.set_new_x(this.speed*move_dir*dt);
 
 	for(var ii=0;ii<this.eyes.length;++ii)
+	{
+		this.eyes[ii].yoff=this.eyes_yoffs[ii]*this.spr.y_scale;
 		this.eyes[ii].loop(simulation,dt,level);
+	}
 
 	for(var ii=0;ii<this.tenticles.length;++ii)
 		this.tenticles[ii].loop(simulation,dt,level);
@@ -87,9 +91,9 @@ gary_t.prototype.draw=function(simulation)
 };
 
 //http://www.zarkonnen.com/airships/tentacle_logic
-function gary_tenticle_t(gary,xoff,yoff,dir,dir_multiplier)
+function gary_tenticle_t(parent,xoff,yoff,dir,dir_multiplier)
 {
-	this.gary=gary;
+	this.parent=parent;
 
 	this.xoff=xoff;
 	this.yoff=yoff;
@@ -103,8 +107,8 @@ function gary_tenticle_t(gary,xoff,yoff,dir,dir_multiplier)
 	if(!dir_multiplier)
 		dir_multiplier=1;
 
-	this.x=this.gary.x+this.xoff;
-	this.y=this.gary.y+this.yoff;
+	this.x=this.parent.x+this.xoff;
+	this.y=this.parent.y+this.yoff;
 
 	this.segments=[];
 	this.target_x=0;
@@ -140,13 +144,13 @@ function gary_tenticle_t(gary,xoff,yoff,dir,dir_multiplier)
 
 gary_tenticle_t.prototype.loop=function(simulation,dt,level)
 {
-	this.x=this.gary.x+this.xoff;
-	this.y=this.gary.y+this.yoff;
+	this.x=this.parent.x+this.xoff;
+	this.y=this.parent.y+this.yoff;
 
-	this.target_x=this.gary.x;
-	this.target_y=this.gary.y+this.pendulum.val;
+	this.target_x=this.parent.x;
+	this.target_y=this.parent.y+this.pendulum.val;
 
-	this.pendulum.loop(simulation,dt,level,this.gary.frenzy);
+	this.pendulum.loop(simulation,dt,level,this.parent.frenzy);
 
 	for(var ii=0;ii<this.segments.length;++ii)
 	{
