@@ -30,7 +30,12 @@ bullet_t.prototype.loop=function(simulation,dt,level)
 	{
 		if(!_this.exploded&&!_this.destroy)
 			for(var ii=0;ii<objects.length;++ii)
-				if(!objects[ii].broken&&check_collision_pos(_this,_this.x-_this.width/2+objects[ii].width/2*centered,_this.y,objects[ii]))
+			{
+				var obj=objects[ii];
+				if(obj.base)
+					obj=objects[ii].base;
+
+				if(!obj.broken&&check_collision_pos(_this,_this.x-_this.width/2+obj.width/2*centered,_this.y,obj))
 				{
 					_this.exploded=true;
 					_this.spr=new sprite_t('explosion.png',3,true,true);
@@ -38,6 +43,7 @@ bullet_t.prototype.loop=function(simulation,dt,level)
 						cb(objects[ii]);
 					break;
 				}
+			}
 	};
 
 	if(!this.exploded&&!this.destroy)
