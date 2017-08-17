@@ -30,7 +30,6 @@ breakable_t.prototype.loop=function(simulation,dt,level)
 
 	this.physics.loop(simulation,dt,level);
 
-	console.log(this.physics.y_velocity);
 	if(this.physics.y_velocity>5)
 		this.will_break=true;
 

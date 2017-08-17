@@ -5,18 +5,18 @@ function gary_t(x,y)
 	this.width=0;
 	this.height=0;
 	this.spr=new sprite_t('gary.png',2,true);
-	this.spr_eye=new sprite_t('eye.png',1,true);
 	this.dir=1;
+	this.speed=10;
 	this.frenzy=0;
 
 	this.physics=new physics_t(this);
 
-	this.eyes=[new gary_eye_t(this),new gary_eye_t(this)];
+	this.eyes=[new eye_t(this),new eye_t(this)];
 	this.eyes[0].xoff=-2;
-	this.eyes[0].yoff=-35;
+	this.eyes[0].yoff=-38.5;
 	this.eyes[0].max_dist=2;
 	this.eyes[1].xoff=1;
-	this.eyes[1].yoff=-16.5;
+	this.eyes[1].yoff=-19.5;
 	this.eyes[1].max_dist=2.5;
 
 	this.tenticles=[];
@@ -24,6 +24,8 @@ function gary_t(x,y)
 	this.tenticles.push(new gary_tenticle_t(this, 15,-20,-Math.PI/4,-1));
 	this.tenticles.push(new gary_tenticle_t(this,-18,-10,Math.PI,1));
 	this.tenticles.push(new gary_tenticle_t(this,-15,-22,-3*Math.PI/4,-1));
+
+	this.pendulum=new pendulum_t(1200,200);
 };
 
 gary_t.prototype.loop=function(simulation,dt,level)
@@ -40,18 +42,18 @@ gary_t.prototype.loop=function(simulation,dt,level)
 	this.frenzy=Math.max(0.3,Math.min(1,80/Math.abs(point_distance(this.x,this.y,level.player.x,level.player.y))));
 
 	//Getto animation hack
-	var dir=1;
-	if(this.tenticles[0].target_inc<0)
-		dir=-1;
+	this.pendulum.loop(simulation,dt,level,this.frenzy);
+	this.spr.x_scale=1.0-this.pendulum.inc/this.pendulum.max*dt/5;
+	this.spr.y_scale=1.0+this.pendulum.inc/this.pendulum.max*dt/5;
 
 	//Dumb AI
+	var dir=1;
+	if(this.pendulum.val<0)
+		dir=-1;
 	var move_dir=1;
 	if(level.player.x<this.x)
 		move_dir=-1;
-	this.physics.set_new_x(10*move_dir*dt);
-
-	this.spr.x_scale=1.0-this.tenticles[0].target_inc/this.tenticles[0].target_max*dt/5;
-	this.spr.y_scale=1.0+this.tenticles[0].target_inc/this.tenticles[0].target_max*dt/5;
+	this.physics.set_new_x(this.speed*move_dir*dt);
 
 	for(var ii=0;ii<this.eyes.length;++ii)
 		this.eyes[ii].loop(simulation,dt,level);
@@ -107,9 +109,7 @@ function gary_tenticle_t(gary,xoff,yoff,dir,dir_multiplier)
 	this.segments=[];
 	this.target_x=0;
 	this.target_y=0;
-	this.target_off=0;
-	this.target_max=200;
-	this.target_inc=1000*dir_multiplier;
+	this.pendulum=new pendulum_t(1000*dir_multiplier,200);
 
 	var num_segments=15;
 	var thickness=8;
@@ -144,18 +144,9 @@ gary_tenticle_t.prototype.loop=function(simulation,dt,level)
 	this.y=this.gary.y+this.yoff;
 
 	this.target_x=this.gary.x;
-	this.target_y=this.gary.y+this.target_off;
-	this.target_off+=this.target_inc*this.gary.frenzy*dt;
-	if(this.target_off>this.target_max)
-	{
-		this.target_off=this.target_max;
-		this.target_inc=-Math.abs(this.target_inc);
-	}
-	if(this.target_off<-this.target_max)
-	{
-		this.target_off=-this.target_max;
-		this.target_inc=Math.abs(this.target_inc);
-	}
+	this.target_y=this.gary.y+this.pendulum.val;
+
+	this.pendulum.loop(simulation,dt,level,this.gary.frenzy);
 
 	for(var ii=0;ii<this.segments.length;++ii)
 	{
@@ -279,47 +270,3 @@ gary_muscle_t.prototype.contract=function()
 {
 	this.length=this.length*this.extend+this.min_length*(1-this.extend);
 };
-
-function gary_eye_t(gary)
-{
-	this.gary=gary;
-	this.xoff=0;
-	this.yoff=0;
-	this.max_dist=0;
-	this.xlook=0;
-	this.ylook=0;
-}
-
-gary_eye_t.prototype.calculate_dists=function()
-{
-	var dists={};
-	dists.gary_width=this.gary.spr.width*this.gary.spr.x_scale;
-	dists.x=this.gary.x+this.xoff;
-	dists.y=this.gary.y+this.yoff;
-	return dists;
-}
-
-gary_eye_t.prototype.loop=function(simulation,dt,level)
-{
-	var dists=this.calculate_dists();
-
-	var dir=point_direction(dists.x,dists.y,level.player.x,level.player.y);
-
-	var dist=Math.min(this.max_dist,point_distance(dists.x,dists.y,level.player.x,level.player.y)/50.0);
-
-	this.xlook=dist*Math.cos(dir);
-	this.ylook=dist*Math.sin(dir);
-}
-
-gary_eye_t.prototype.draw=function(simulation)
-{
-	if(!simulation)
-		return;
-
-	var dists=this.calculate_dists();
-
-	simulation.ctx.save();
-	simulation.ctx.translate(dists.x+this.xlook,dists.y+this.ylook);
-	this.gary.spr_eye.draw(simulation);
-	simulation.ctx.restore();
-}
