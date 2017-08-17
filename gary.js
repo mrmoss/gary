@@ -39,9 +39,10 @@ function gary_mini_t(x,y)
 	this.base.spr=new sprite_t('gary_mini.png',2,true);
 	this.base.speed=15;
 	this.base.noflip=false;
+	this.base.max_frenzy=2;
 
-	this.base.tenticles.push(new gary_tenticle_t(this.base, 10,-10,-Math.PI/4,1,8,5));
-	this.base.tenticles.push(new gary_tenticle_t(this.base,-10,-10,-3*Math.PI/4,-1,8,5));
+	this.base.tenticles.push(new gary_tenticle_t(this.base, 10,-10,-Math.PI/4,1,12,6));
+	this.base.tenticles.push(new gary_tenticle_t(this.base,-10,-10,-3*Math.PI/4,-1,12,6));
 
 	this.base.eyes.push(new eye_t(this.base));
 	this.base.eyes_xoffs.push(-1);
@@ -73,6 +74,7 @@ function gary_base_t(x,y)
 	this.dir=1;
 	this.speed=0;
 	this.frenzy=0;
+	this.max_frenzy=1;
 	this.noflip=true;
 
 	this.physics=new physics_t(this);
@@ -97,7 +99,7 @@ gary_base_t.prototype.loop=function(simulation,dt,level)
 	this.physics.loop(simulation,dt,level);
 
 	//Flail tenticles faster if player is close
-	this.frenzy=Math.max(0.3,Math.min(1,80/Math.abs(point_distance(this.x,this.y,level.player.x,level.player.y))));
+	this.frenzy=Math.max(0.3,Math.min(this.max_frenzy,80/Math.abs(point_distance(this.x,this.y,level.player.x,level.player.y))));
 
 	//Getto animation hack
 	this.pendulum.loop(simulation,dt,level,this.frenzy);
@@ -187,9 +189,9 @@ function gary_tenticle_t(parent,xoff,yoff,dir,dir_multiplier,segments,start_thic
 		parent.dir=dir;
 		parent.target_dir=Math.PI/2.0/segments*ii*dir_multiplier;
 
-		var length=start_thickness-ii/2.0;
-		parent.left_muscle=new gary_muscle_t(length/2.0,length);
-		parent.right_muscle=new gary_muscle_t(length/2.0,length);
+		var distance=start_thickness-ii/2.0;
+		parent.left_muscle=new gary_muscle_t(distance/2.0,distance);
+		parent.right_muscle=new gary_muscle_t(distance/2.0,distance);
 
 		parent.xoff=total_length;
 		parent.yoff=0;
@@ -197,7 +199,7 @@ function gary_tenticle_t(parent,xoff,yoff,dir,dir_multiplier,segments,start_thic
 		this.segments.push(parent);
 
 		thickness=thickness*0.92;
-		total_length+=length;
+		total_length+=distance;
 	}
 }
 
