@@ -108,9 +108,10 @@ gary_base_t.prototype.loop=function(simulation,dt,level)
 	this.spr.y_scale=1.0+this.pendulum.inc/this.pendulum.max*dt/5;
 
 	//Dumb AI
-	if(level.player.x<this.x)
+	var buffer=5;
+	if(level.player.x<this.x-buffer)
 		this.dir=-1;
-	else
+	else if(level.player.x>this.x+buffer)
 		this.dir=1;
 	this.physics.set_new_x(this.speed*this.dir*dt);
 

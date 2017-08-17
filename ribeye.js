@@ -41,13 +41,12 @@ ribeye_t.prototype.loop=function(simulation,dt,level)
 	this.spr.y_scale=1.0+this.pendulum.inc/this.pendulum.max*dt/2.5;
 
 	//Dumb AI
-	var dir=1;
-	if(this.pendulum.val<0)
-		dir=-1;
-	var move_dir=1;
-	if(level.player.x<this.x)
-		move_dir=-1;
-	this.physics.set_new_x(this.speed*move_dir*dt);
+	var buffer=5;
+	if(level.player.x<this.x-buffer)
+		this.dir=-1;
+	else if(level.player.x>this.x+buffer)
+		this.dir=1;
+	this.physics.set_new_x(this.speed*this.dir*dt);
 };
 
 ribeye_t.prototype.draw=function(simulation)
