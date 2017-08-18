@@ -6,7 +6,7 @@ function eye_t(parent)
 	this.xoff=0;
 	this.yoff=0;
 	this.max_dist=0;
-	this.spr=new sprite_t('eye.png',1,true,true);
+	this.spr=new sprite_t('img/eye.png',1,true,true);
 }
 
 eye_t.prototype.loop=function(simulation,dt,level)

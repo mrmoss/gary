@@ -4,7 +4,7 @@ function ribeye_t(x,y)
 	this.y=y;
 	this.width=0;
 	this.height=0;
-	this.spr=new sprite_t('ribeye.png',2,true);
+	this.spr=new sprite_t('img/ribeye.png',2,true);
 	this.dir=1;
 	this.speed=30;
 	this.frenzy=0;

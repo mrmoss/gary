@@ -5,9 +5,9 @@ function player_t(x,y)
 	this.width=0;
 	this.height=0;
 	this.dir=1;
-	this.spr_idle=new sprite_t('player_idle.png',1,true);
-	this.spr_move=new sprite_t('player_move.png',4,true);
-	this.spr_jump=new sprite_t('player_jump.png',1,true);
+	this.spr_idle=new sprite_t('img/player_idle.png',1,true);
+	this.spr_move=new sprite_t('img/player_move.png',4,true);
+	this.spr_jump=new sprite_t('img/player_jump.png',1,true);
 	this.spr=this.spr_idle;
 	this.speed=100;
 	this.animation_speed=8;

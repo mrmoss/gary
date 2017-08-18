@@ -5,7 +5,7 @@ function bullet_t(x,y)
 	this.width=0;
 	this.height=0;
 	this.dir=1;
-	this.spr=new sprite_t('bullet.png',4,true,true);
+	this.spr=new sprite_t('img/bullet.png',4,true,true);
 	this.speed=150;
 	this.animation_speed=20;
 	this.moved_dist=0;
@@ -38,7 +38,7 @@ bullet_t.prototype.loop=function(simulation,dt,level)
 				if(!obj.broken&&check_collision_pos(_this,_this.x-_this.width/2+obj.width/2*centered,_this.y,obj))
 				{
 					_this.exploded=true;
-					_this.spr=new sprite_t('explosion.png',3,true,true);
+					_this.spr=new sprite_t('img/explosion.png',3,true,true);
 					if(cb)
 						cb(objects[ii]);
 					break;

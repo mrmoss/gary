@@ -1,7 +1,7 @@
 function gary_t(x,y)
 {
 	this.base=new gary_base_t(x,y);
-	this.base.spr=new sprite_t('gary.png',2,true);
+	this.base.spr=new sprite_t('img/gary.png',2,true);
 	this.base.speed=10;
 
 	this.base.tenticles.push(new gary_tenticle_t(this.base, 18,-10,0,1,15,8));
@@ -36,7 +36,7 @@ gary_t.prototype.draw=function(simulation)
 function gary_mini_t(x,y)
 {
 	this.base=new gary_base_t(x,y);
-	this.base.spr=new sprite_t('gary_mini.png',2,true);
+	this.base.spr=new sprite_t('img/gary_mini.png',2,true);
 	this.base.speed=15;
 	this.base.noflip=false;
 	this.base.max_frenzy=2;

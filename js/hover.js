@@ -4,7 +4,7 @@ function hover_t(x,y)
 	this.y=y;
 	this.width=0;
 	this.height=0;
-	this.spr=new sprite_t('hover.png',4);
+	this.spr=new sprite_t('img/hover.png',4);
 	this.animation_speed=10;
 	this.speed=20;
 	this.dir=-1;
