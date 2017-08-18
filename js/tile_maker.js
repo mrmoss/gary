@@ -9,6 +9,9 @@ function tile_maker_t(source,width,height)
 	this.tiles=[];
 	this.tiles_per_y=0;
 	this.chosen_tile=-1;
+
+	this.under_mouse_x=0;
+	this.under_mouse_y=0;
 }
 
 tile_maker_t.prototype.setup=function(simulation)
@@ -27,21 +30,23 @@ tile_maker_t.prototype.loop=function(simulation,dt)
 {
 	this.shown=simulation.keys_down[kb_control];
 
+	this.under_mouse_x=Math.floor(simulation.mouse_x/this.width);
+	this.under_mouse_y=Math.floor(simulation.mouse_y/this.height);
+
 	if(simulation.mouse_down[mb_left])
 	{
-		var xx=Math.floor(simulation.mouse_x/this.width);
-		var yy=Math.floor(simulation.mouse_y/this.height);
 		if(this.shown)
 		{
+			var xx=this.under_mouse_x;
 			if(xx>=this.tiles_per_y)
 				xx=this.width*this.height+1;
-			this.chosen_tile=yy*this.tiles_per_y+xx;
+			this.chosen_tile=this.under_mouse_y*this.tiles_per_y+xx;
 			if(this.chosen_tile<0||this.chosen_tile>=this.width*this.height)
 				this.chosen_tile=-1;
 		}
 		else
 		{
-			this.tiles[yy][xx]=this.chosen_tile;
+			this.tiles[this.under_mouse_y][this.under_mouse_x]=this.chosen_tile;
 		}
 	}
 }
@@ -71,6 +76,20 @@ tile_maker_t.prototype.draw=function(simulation)
 		}
 	}
 
+	var chosen_tile_x=Math.floor(this.chosen_tile%this.tiles_per_y);
+	var chosen_tile_y=Math.floor(this.chosen_tile/this.tiles_per_y);
+
+	if(this.chosen_tile>=0)
+		simulation.ctx.drawImage(this.image,
+			chosen_tile_x*this.width,
+			chosen_tile_y*this.height,
+			this.width,
+			this.height,
+			this.under_mouse_x*this.width,
+			this.under_mouse_y*this.width,
+			this.width,
+			this.height);
+
 	if(this.shown)
 	{
 		simulation.ctx.drawImage(this.image,
@@ -83,18 +102,17 @@ tile_maker_t.prototype.draw=function(simulation)
 			this.image.width,
 			this.image.height);
 
-		var tile_x=Math.floor(this.chosen_tile%this.tiles_per_y);
-		var tile_y=Math.floor(this.chosen_tile/this.tiles_per_y);
-
-		simulation.ctx.save();
 		simulation.ctx.lineWidth=2;
 		simulation.ctx.strokeStyle='#ffffff';
 		simulation.ctx.beginPath();
 		simulation.ctx.rect(1,1,this.image.width-simulation.ctx.lineWidth,this.image.height-simulation.ctx.lineWidth);
 		simulation.ctx.stroke();
-		simulation.ctx.beginPath();
-		simulation.ctx.rect(tile_x*this.width+1,tile_y*this.height+1,this.width-simulation.ctx.lineWidth,this.height-simulation.ctx.lineWidth);
-		simulation.ctx.stroke();
-		simulation.ctx.restore();
+
+		if(this.chosen_tile>=0)
+		{
+			simulation.ctx.beginPath();
+			simulation.ctx.rect(chosen_tile_x*this.width+1,chosen_tile_y*this.height+1,this.width-simulation.ctx.lineWidth,this.height-simulation.ctx.lineWidth);
+			simulation.ctx.stroke();
+		}
 	}
 }

@@ -121,6 +121,7 @@ simulation_t.prototype.setup=function()
 
 simulation_t.prototype.keydown=function(evt)
 {
+	evt.preventDefault();
 	if(!this.keys_down[evt.keyCode])
 		this.keys_pressed[evt.keyCode]=true;
 
@@ -129,12 +130,14 @@ simulation_t.prototype.keydown=function(evt)
 
 simulation_t.prototype.keyup=function(evt)
 {
+	evt.preventDefault();
 	this.keys_released[evt.keyCode]=true;
 	this.keys_down[evt.keyCode]=false;
 };
 
 simulation_t.prototype.mousedown=function(evt)
 {
+	evt.preventDefault();
 	if(!this.mouse_down[evt.button])
 		this.mouse_pressed[evt.button]=true;
 
@@ -143,6 +146,7 @@ simulation_t.prototype.mousedown=function(evt)
 
 simulation_t.prototype.mouseup=function(evt)
 {
+	evt.preventDefault();
 	this.mouse_released[evt.button]=true;
 	this.mouse_down[evt.button]=false;
 };
