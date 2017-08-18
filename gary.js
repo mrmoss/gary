@@ -290,8 +290,8 @@ gary_segment_t.prototype.draw=function(simulation)
 	simulation.ctx.save();
 	simulation.ctx.translate(this.x,this.y);
 
-	simulation.ctx.stokeStyle="#000000";
 	simulation.ctx.lineWidth=1.7;
+	simulation.ctx.strokeStyle='#000000';
 	simulation.ctx.fillStyle=this.color;
 	simulation.ctx.beginPath();
 	simulation.ctx.arc(0,0,(this.thickness-simulation.ctx.lineWidth)/2,0,2*Math.PI,false);

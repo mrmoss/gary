@@ -3,6 +3,9 @@ var kb_up=38;
 var kb_right=39;
 var kb_down=40;
 var kb_space=32;
+var kb_shift=16;
+var kb_control=17;
+var kb_alt=18;
 var mb_left=0;
 var mb_middle=1;
 var mb_right=2;
@@ -174,6 +177,7 @@ simulation_t.prototype.draw=function()
 {
 	if(this.canvas&&this.ctx&&this.user_draw)
 	{
+		this.ctx.beginPath();
 		this.ctx.fillStyle=this.clear_color;
 		this.ctx.fillRect(0,0,this.canvas.width,this.canvas.height);
 		this.user_draw();
