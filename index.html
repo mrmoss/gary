@@ -15,13 +15,15 @@
 		<script src='player.js'></script>
 		<script src='ribeye.js'></script>
 		<script src='sprite.js'></script>
+		<script src='tile_maker.js'></script>
 		<script>
 
 			var simulation=null;
+			var tile_maker=new tile_maker_t('tiles.png',16,16);
 
 			function init()
 			{
-				simulation=new canvas_t(document.getElementById('canvas'),setup,loop,draw);
+				simulation=new simulation_t(document.getElementById('canvas'),setup,loop,draw);
 
 				if(!simulation)
 					alert('Is WebGL enabled?');
@@ -33,11 +35,13 @@
 
 			function setup(simulation)
 			{
+				tile_maker.setup(simulation);
 				level=new level_t(simulation);
 			}
 
 			function loop(dt)
 			{
+				tile_maker.loop(simulation,dt);
 				level.loop(simulation,dt);
 
 			}
@@ -45,6 +49,7 @@
 			function draw()
 			{
 				level.draw(simulation);
+				tile_maker.draw(simulation);
 			}
 		</script>
 	</head>
