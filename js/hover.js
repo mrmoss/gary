@@ -42,7 +42,7 @@ hover_t.prototype.loop=function(simulation,dt,level)
 	this.x+=this.speed*this.dir*dt;
 	for(var ii=0;ii<this.move_with.length;++ii)
 		if(this.move_with[ii])
-			this.move_with[ii].parent.x+=this.speed*this.dir*dt;
+			this.move_with[ii].add_new_x(this.speed*this.dir*dt);
 
 	if(this.x>this.start_pos+this.max_dist/2)
 		this.dir=-1;

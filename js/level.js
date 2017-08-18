@@ -79,9 +79,8 @@ level_t.prototype.draw=function(simulation)
 		this.breakables[ii].draw(simulation);
 	for(var ii=0;ii<this.hovers.length;++ii)
 		this.hovers[ii].draw(simulation);
+	this.tile_maker.draw(simulation);
 	for(var ii=0;ii<this.bullets.length;++ii)
 		if(this.bullets[ii].exploded)
 			this.bullets[ii].draw(simulation);
-
-	this.tile_maker.draw(simulation);
 }

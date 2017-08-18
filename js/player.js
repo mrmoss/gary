@@ -28,12 +28,12 @@ player_t.prototype.loop=function(simulation,dt,level)
 	if(simulation.keys_down[kb_right]&&!simulation.keys_down[kb_left])
 	{
 		this.dir=1;
-		this.physics.set_new_x(this.speed*dt);
+		this.physics.add_new_x(this.speed*dt);
 	}
 	if(!simulation.keys_down[kb_right]&&simulation.keys_down[kb_left])
 	{
 		this.dir=-1;
-		this.physics.set_new_x(-this.speed*dt);
+		this.physics.add_new_x(-this.speed*dt);
 	}
 
 	if(simulation.keys_pressed[kb_up])

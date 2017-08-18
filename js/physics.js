@@ -16,6 +16,12 @@ physics_t.prototype.set_new_x=function(new_x)
 	this.moved=true;
 }
 
+physics_t.prototype.add_new_x=function(new_x)
+{
+	this.new_x+=new_x;
+	this.moved=true;
+}
+
 physics_t.prototype.set_jump=function()
 {
 	if(!this.is_falling())
