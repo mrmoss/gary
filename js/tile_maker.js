@@ -1,3 +1,7 @@
+//Three types of positions:
+//  tpos  - position of a tile in a tileset
+//  gpos  - position in the map in terms of tiles {0,0} to {floor(map_w/tile_w),floor(map_h/tile_h)}
+//  xypos - position in the actual map {0,0} to {map_w,map_h}
 function tile_maker_t(source,width,height)
 {
 	this.image=new Image();
