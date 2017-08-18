@@ -60,16 +60,16 @@ physics_t.prototype.loop=function(simulation,dt,level)
 	if(this.y_velocity<0)
 		y_velocity_multiplier=-1;
 
-	//Falling Collisions with Crates
+	//Falling Collisions with Blocks
 	if(this.y_velocity!=0)
-		for(var ii=0;ii<level.crates.length;++ii)
+		for(var ii=0;ii<level.blocks.length;++ii)
 		{
 			if(collision)
 				break;
 			for(var dist=0;dist<Math.abs(this.y_velocity);dist+=check_sensitivity)
-				if(check_collision_pos(this.parent,this.parent.x-this.parent.width/2,this.parent.y+dist*y_velocity_multiplier,level.crates[ii]))
+				if(check_collision_pos(this.parent,this.parent.x-this.parent.width/2,this.parent.y+dist*y_velocity_multiplier,level.blocks[ii]))
 				{
-					this.parent.y=level.crates[ii].y-level.crates[ii].height;
+					this.parent.y=level.blocks[ii].y-level.blocks[ii].height;
 					collision=true;
 					this.y_velocity=0;
 					y_velocity_multiplier=0;
@@ -112,9 +112,9 @@ physics_t.prototype.loop=function(simulation,dt,level)
 	{
 		var collision=false;
 
-		//We Move Based Collisions with Crates
-		for(var ii=0;ii<level.crates.length;++ii)
-			if(check_collision_pos(this.parent,this.parent.x+this.new_x-this.parent.width/2,this.parent.y,level.crates[ii]))
+		//We Move Based Collisions with Blocks
+		for(var ii=0;ii<level.blocks.length;++ii)
+			if(check_collision_pos(this.parent,this.parent.x+this.new_x-this.parent.width/2,this.parent.y,level.blocks[ii]))
 			{
 				collision=true;
 				break;

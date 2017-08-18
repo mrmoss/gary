@@ -2,11 +2,13 @@ function level_t(simulation)
 {
 	var canvas_width=simulation.canvas.width;
 	var canvas_height=simulation.canvas.height;
-
 	simulation.clear_color='#5e5e5e';
+
+	this.tile_maker=new tile_maker_t('img/tiles.png',16,16);
 
 	this.monsters=[];
 	this.breakables=[];
+	this.blocks=[];
 	this.crates=[];
 	this.hovers=[];
 	this.bullets=[];
@@ -41,6 +43,8 @@ function level_t(simulation)
 
 level_t.prototype.loop=function(simulation,dt)
 {
+	this.tile_maker.loop(simulation,dt,this);
+
 	for(var ii=0;ii<this.monsters.length;++ii)
 		this.monsters[ii].loop(simulation,dt,this);
 	for(var ii=0;ii<this.bullets.length;++ii)
@@ -52,7 +56,6 @@ level_t.prototype.loop=function(simulation,dt)
 		this.breakables[ii].loop(simulation,dt,this);
 	for(var ii=0;ii<this.hovers.length;++ii)
 		this.hovers[ii].loop(simulation,dt,this);
-
 
 	var new_bullets=[];
 	var max_bullet_dist=1000;
@@ -79,4 +82,6 @@ level_t.prototype.draw=function(simulation)
 	for(var ii=0;ii<this.bullets.length;++ii)
 		if(this.bullets[ii].exploded)
 			this.bullets[ii].draw(simulation);
+
+	this.tile_maker.draw(simulation);
 }
