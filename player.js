@@ -60,7 +60,10 @@ player_t.prototype.loop=function(simulation,dt,level)
 
 	if(simulation.keys_pressed[kb_space])
 	{
-		var bullet=new bullet_t(this.x+8*this.dir,this.y-10);
+		var yoff=-10;
+		if(this.physics.is_falling())
+			yoff=-16;
+		var bullet=new bullet_t(this.x+8*this.dir,this.y+yoff);
 		bullet.dir=this.dir;
 		level.bullets.push(bullet);
 	}
