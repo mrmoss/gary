@@ -50,9 +50,9 @@ bullet_t.prototype.loop=function(simulation,dt,level)
 	{
 		this.x+=this.speed*this.dir*dt;
 
-		collision_func(level.blocks,0,null);
-		collision_func(level.monsters,1,null);
 		collision_func(level.breakables,1,function(other){other.shatter();});
+		collision_func(level.monsters,1,null);
+		collision_func(level.blocks,0,null);
 	}
 
 	if(this.exploded&&this.spr.frame>=this.spr.frame_count)
