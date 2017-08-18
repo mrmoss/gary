@@ -21,7 +21,7 @@ function level_t(simulation)
 	this.monsters.push(new gary_mini_t(270,crate_start_y-crate_size));
 	this.monsters.push(new ribeye_t(140,crate_start_y-crate_size));
 
-	this.breakables.push(new breakable_t(canvas_width/2-crate_size*4,crate_start_y-crate_size*5,new sprite_t('img/urn.png',4,true)));
+	this.breakables.push(new breakable_t(canvas_width/2-crate_size*4,crate_start_y-crate_size*6,new sprite_t('img/urn.png',4,true)));
 	this.breakables.push(new breakable_t(canvas_width/2+crate_size*2,0,new sprite_t('img/urn.png',4,true)));
 	this.breakables.push(new breakable_t(canvas_width/2+crate_size*6,crate_start_y-crate_size,new sprite_t('img/urn.png',4,true)));
 

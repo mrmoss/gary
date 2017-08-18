@@ -7,15 +7,14 @@ function tile_maker_t(source,width,height)
 	this.shown=true;
 
 	this.tiles=null;
-	this.chosen_tile=-1;
+	this.place_tpos=null;
 
-	this.under_mouse_x=0;
-	this.under_mouse_y=0;
+	this.mouse_pos={x:0,y:0};
 }
 
 tile_maker_t.prototype.tile_to_xy_pos=function(tile_x,tile_y)
 {
-	return {x:tile_x*this.width,y:tile_y*this.height};
+	return {x:tile_x*this.width,y:(tile_y+1)*this.height};
 }
 
 tile_maker_t.prototype.get_tile_xy=function(tile_num)
@@ -43,7 +42,7 @@ tile_maker_t.prototype.loop=function(simulation,dt,level)
 		{
 			this.tiles.push([]);
 			for(var xx=0;xx<Math.floor(simulation.canvas.width/this.width);++xx)
-				this.tiles[yy].push([-1,null]);
+				this.tiles[yy].push(new tile_t(-1,-1,null));
 		}
 	}
 
@@ -52,43 +51,44 @@ tile_maker_t.prototype.loop=function(simulation,dt,level)
 
 	this.shown=simulation.keys_down[kb_control];
 
-	this.under_mouse_x=Math.floor(simulation.mouse_x/this.width);
-	this.under_mouse_y=Math.floor(simulation.mouse_y/this.height);
+	this.mouse_pos={x:Math.floor(simulation.mouse_x/this.width),y:Math.floor(simulation.mouse_y/this.height)};
 
-	var tiles_per_y=this.get_tile_maker_wh().w;
+	var tile_maker_size=this.get_tile_maker_wh();
+	var tiles_per_y=tile_maker_size.w;
 
 	if(simulation.mouse_down[mb_left])
 	{
 		if(this.shown)
 		{
-			var xx=this.under_mouse_x;
-			if(xx>=tiles_per_y)
-				xx=this.width*this.height+1;
-			this.chosen_tile=this.under_mouse_y*tiles_per_y+xx;
-			if(this.chosen_tile<0||this.chosen_tile>=this.width*this.height)
-				this.chosen_tile=-1;
+			if(this.mouse_pos.x<tile_maker_size.w&&this.mouse_pos.y<tile_maker_size.h)
+				this.place_tpos={x:this.mouse_pos.x,y:this.mouse_pos.y};
+			else
+				this.place_tpos={x:-1,y:-1};
 		}
-		else
+		else if(this.place_tpos)
 		{
-			var obj=this.tiles[this.under_mouse_y][this.under_mouse_x][1];
+			var tile=this.tiles[this.mouse_pos.y][this.mouse_pos.x];
+			tile.tx=this.place_tpos.x;
+			tile.ty=this.place_tpos.y;
 
-			if(obj&&this.chosen_tile<0)
+			//Removed tile, time to remove the block under it
+			if(!tile.visible()&&tile.block)
 			{
 				var new_blocks=[];
 				for(var ii=0;ii<level.blocks.length;++ii)
-					if(!(level.blocks[ii]===obj))
+					if(!(level.blocks[ii]===tile.block))
 						new_blocks.push(level.blocks[ii]);
 				level.blocks=new_blocks;
-				this.tiles[this.under_mouse_y][this.under_mouse_x][1]=null;
+				tile.block=null;
 			}
-			if(!obj&&this.chosen_tile>=0)
+
+			//Added a tile with no block under it, add it
+			else if(tile.visible()&&!tile.block)
 			{
-				var pos=this.tile_to_xy_pos(this.under_mouse_x,this.under_mouse_y+1);
-				var obj=new block_t(pos.x,pos.y,this.width,this.height);
-				this.tiles[this.under_mouse_y][this.under_mouse_x][1]=obj;
-				level.blocks.push(obj);
+				var pos=this.tile_to_xy_pos(this.mouse_pos.x,this.mouse_pos.y);
+				tile.block=new block_t(pos.x,pos.y,this.width,this.height);
+				level.blocks.push(tile.block);
 			}
-			this.tiles[this.under_mouse_y][this.under_mouse_x][0]=this.chosen_tile;
 		}
 	}
 }
@@ -102,25 +102,18 @@ tile_maker_t.prototype.draw=function(simulation)
 	{
 		for(var xx=0;xx<Math.floor(simulation.canvas.width/this.width);++xx)
 		{
-			var tile=this.tiles[yy][xx][0];
-			if(tile<0||tile>=this.width*this.height)
-				continue;
-
-			var tile_pos=this.get_tile_xy(tile);
-
-			simulation.ctx.drawImage(this.image,
-				tile_pos.x*this.width,
-				tile_pos.y*this.height,
-				this.width,
-				this.height,
-				xx*this.width,
-				yy*this.width,
-				this.width,
-				this.height);
+			if(this.tiles[yy][xx].visible())
+				simulation.ctx.drawImage(this.image,
+					this.tiles[yy][xx].tx*this.width,
+					this.tiles[yy][xx].ty*this.height,
+					this.width,
+					this.height,
+					xx*this.width,
+					yy*this.height,
+					this.width,
+					this.height);
 		}
 	}
-
-	var chosen_tile_pos=this.get_tile_xy(this.chosen_tile);
 
 	if(this.shown)
 	{
@@ -143,23 +136,35 @@ tile_maker_t.prototype.draw=function(simulation)
 
 		var tile_maker_size=this.get_tile_maker_wh();
 
-		if(chosen_tile_pos.x<tile_maker_size.w&&chosen_tile_pos.y<tile_maker_size.h)
+		if(this.place_tpos)
 		{
 			simulation.ctx.beginPath();
-			simulation.ctx.rect(line_width/2.0+chosen_tile_pos.x*this.width,line_width/2.0+chosen_tile_pos.y*this.height,this.width-line_width,this.height-line_width);
+			simulation.ctx.rect(line_width/2.0+this.place_tpos.x*this.width,line_width/2.0+this.place_tpos.y*this.height,this.width-line_width,this.height-line_width);
 			simulation.ctx.stroke();
 		}
 	}
-	else if(this.chosen_tile>=0)
+	else if(this.place_tpos)
 	{
 		simulation.ctx.drawImage(this.image,
-			chosen_tile_pos.x*this.width,
-			chosen_tile_pos.y*this.height,
+			this.place_tpos.x*this.width,
+			this.place_tpos.y*this.height,
 			this.width,
 			this.height,
-			this.under_mouse_x*this.width,
-			this.under_mouse_y*this.width,
+			this.mouse_pos.x*this.width,
+			this.mouse_pos.y*this.height,
 			this.width,
 			this.height);
 	}
+}
+
+function tile_t(tx,ty,block)
+{
+	this.tx=tx;
+	this.ty=ty;
+	this.block=block
+}
+
+tile_t.prototype.visible=function()
+{
+	return (this.tx>=0&&this.ty>=0);
 }

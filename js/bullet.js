@@ -60,13 +60,6 @@ bullet_t.prototype.loop=function(simulation,dt,level)
 		this.destroy=true;
 		this.spr=null;
 	}
-
-	//for(var ii=0;ii<level.garys.length;++ii)
-	//	for(var jj=0;jj<level.garys[ii].tenticles.length;++jj)
-	//	{
-	//		console.log(level.garys[ii].tenticles[jj].segments.length);
-	//		collision_func(level.garys[ii].tenticles[jj].segments,1);
-	//	}
 }
 
 bullet_t.prototype.draw=function(simulation)

@@ -21,7 +21,7 @@ player_t.prototype.loop=function(simulation,dt,level)
 		return;
 
 	this.width=10;
-	this.height=Math.max(this.spr_idle.height,this.spr_move.height,this.spr_jump.height);
+	this.height=this.spr_move.height;
 
 	this.physics.loop(simulation,dt,level);
 
@@ -74,8 +74,22 @@ player_t.prototype.draw=function(simulation)
 	if(!simulation)
 		return;
 
+	if(!this.spr_idle.height||!this.spr_move.height||!this.spr_jump.height)
+	{
+		simulation.ctx.save();
+		simulation.ctx.translate(-100000,-100000);
+		this.spr_idle.draw(simulation);
+		this.spr_move.draw(simulation);
+		this.spr_jump.draw(simulation);
+		simulation.ctx.restore();
+	}
+
+	var yoff=0;
+	if(this.physics.is_falling())
+		yoff=(this.spr_jump.height-this.spr_idle.height)/2;
+
 	simulation.ctx.save();
-	simulation.ctx.translate(this.x,this.y);
+	simulation.ctx.translate(this.x,this.y+yoff);
 	this.spr.draw(simulation);
 	simulation.ctx.restore();
 };

@@ -67,15 +67,26 @@ physics_t.prototype.loop=function(simulation,dt,level)
 			if(collision)
 				break;
 			for(var dist=0;dist<Math.abs(this.y_velocity);dist+=check_sensitivity)
-				if(check_collision_pos(this.parent,this.parent.x-this.parent.width/2,this.parent.y+dist*y_velocity_multiplier,level.blocks[ii]))
+			{
+				var check_x=this.parent.x-this.parent.width/2;
+				var check_y=this.parent.y+dist*y_velocity_multiplier;
+				if(check_collision_pos(this.parent,check_x,check_y,level.blocks[ii]))
 				{
-					this.parent.y=level.blocks[ii].y-level.blocks[ii].height;
+					var block_top=level.blocks[ii].y-level.blocks[ii].height;
+
+					if(this.parent.y<=block_top+this.y_velocity)
+					{
+						this.parent.y=block_top;
+						this.jump=false;
+					}
+					else
+						this.parent.y=check_y+check_sensitivity;
 					collision=true;
 					this.y_velocity=0;
 					y_velocity_multiplier=0;
-					this.jump=false;
 					break;
 				}
+			}
 		}
 
 	//Falling Collisions with Hovers (Under player only)
